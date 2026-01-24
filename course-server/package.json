@@ -1,0 +1,24 @@
+{
+  "name": "course-server",
+  "version": "1.0.0",
+  "description": "Build a server for online course system",
+  "keywords": [
+    "course",
+    "online course",
+    "e-learning"
+  ],
+  "license": "ISC",
+  "author": "Leviz",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "eslint": "^9.39.2",
+    "nodemon": "^3.1.11"
+  }
+}
