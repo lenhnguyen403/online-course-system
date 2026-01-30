@@ -9,9 +9,10 @@
   ],
   "license": "ISC",
   "author": "Leviz",
-  "type": "commonjs",
+  "type": "module",
   "main": "index.js",
   "scripts": {
+    "start": "nodemon --inspect src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
@@ -19,6 +20,8 @@
   },
   "devDependencies": {
     "eslint": "^9.39.2",
-    "nodemon": "^3.1.11"
+    "morgan": "^1.10.1",
+    "nodemon": "^3.1.11",
+    "prettier": "^3.8.1"
   }
 }
