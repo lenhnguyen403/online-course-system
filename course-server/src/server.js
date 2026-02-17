@@ -1,16 +1,27 @@
 import express from 'express';
-import route from './routes/index.js';
 import dotenv from 'dotenv'
+import cors from 'cors'
+import router from './routes/index.js'
+import * as cf from './config/index.js'
+import morgan from 'morgan';
 
 const app = express();
 dotenv.config()
 
 const port = process.env.PORT || 3003;
 
+cf.connectDB()
+cf.connectCloudinary()
+
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(cors({ origin: '*', credentials: true }))
 
-route(app);
+if (process.env.NODE_ENV === 'development') {
+    app.use(morgan('dev'))
+}
+
+router(app)
 
 app.get('/', (req, res) => {
     res.send('This is the Online Course System server.');

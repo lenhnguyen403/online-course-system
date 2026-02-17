@@ -1,0 +1,158 @@
+API_PREFIX:
+
+/api/v1
+
+1️⃣ AUTH & ACCOUNT MODULE
+🔐 Authentication
+POST   /auth/login
+POST   /auth/logout
+POST   /auth/refresh-token
+POST   /auth/forgot-password
+POST   /auth/reset-password
+
+👤 Profile
+GET    /me
+PUT    /me
+PUT    /me/change-password
+GET    /me/classes
+GET    /me/attendance
+GET    /me/payments
+GET    /me/exams
+
+
+→ Cực quan trọng. Tránh truyền id lung tung.
+
+2️⃣ ADMIN – USER MANAGEMENT
+GET    /admin/users
+POST   /admin/users
+GET    /admin/users/{id}
+PUT    /admin/users/{id}
+DELETE /admin/users/{id}
+PATCH  /admin/users/{id}/status
+POST   /admin/users/{id}/send-credentials
+
+3️⃣ SUBJECT MANAGEMENT
+GET    /subjects
+POST   /subjects
+GET    /subjects/{id}
+PUT    /subjects/{id}
+DELETE /subjects/{id}
+
+4️⃣ COURSE MANAGEMENT
+GET    /courses
+POST   /courses
+GET    /courses/{id}
+PUT    /courses/{id}
+DELETE /courses/{id}
+GET    /courses/{id}/classes
+
+5️⃣ CLASS MANAGEMENT
+GET    /classes
+POST   /classes
+GET    /classes/{id}
+PUT    /classes/{id}
+DELETE /classes/{id}
+
+👥 Student enrollment (context cực quan trọng)
+GET    /classes/{id}/students
+POST   /classes/{id}/students
+GET    /classes/{id}/students/{studentId}
+PUT    /classes/{id}/students/{studentId}
+DELETE /classes/{id}/students/{studentId}
+PATCH  /classes/{id}/students/{studentId}/status
+
+
+Status:
+
+ACTIVE
+
+SUSPENDED
+
+TRANSFER_PENDING
+
+DROPPED
+
+👨‍🏫 Assign teacher
+GET    /classes/{id}/teachers
+POST   /classes/{id}/teachers
+DELETE /classes/{id}/teachers/{teacherId}
+
+6️⃣ TEACHER MODULE
+GET    /teachers
+GET    /teachers/{id}
+GET    /teachers/{id}/classes
+GET    /teachers/{id}/students
+
+7️⃣ ATTENDANCE MODULE
+GET    /classes/{classId}/attendance
+POST   /classes/{classId}/attendance?date=yyyy-MM-dd
+PUT    /attendance/{attendanceId}
+GET    /students/{studentId}/attendance
+
+
+Status:
+
+PRESENT
+
+ABSENT
+
+LATE
+
+8️⃣ JOURNAL MODULE (Thiếu lớn nhất trong bản cũ)
+📘 Class Journal
+GET    /classes/{classId}/journals
+POST   /classes/{classId}/journals
+GET    /classes/{classId}/journals/{id}
+DELETE /classes/{classId}/journals/{id}
+
+
+System auto:
+
+createdDate
+
+teacherName
+
+📗 Student Journal
+GET    /students/{studentId}/journals
+POST   /students/{studentId}/journals
+GET    /students/{studentId}/journals/{id}
+DELETE /students/{studentId}/journals/{id}
+
+9️⃣ EXAM MODULE
+GET    /classes/{classId}/exams
+POST   /classes/{classId}/exams
+GET    /exams/{id}
+PUT    /exams/{id}
+DELETE /exams/{id}
+
+📝 Exam Results
+GET    /exams/{id}/results
+POST   /exams/{id}/results
+PUT    /exams/{examId}/results/{studentId}
+GET    /students/{studentId}/results
+GET    /students/{studentId}/average-score
+GET    /classes/{classId}/average-score
+
+🔟 PAYMENT MODULE
+GET    /students/{studentId}/payments
+POST   /students/{studentId}/payments
+PUT    /payments/{id}
+DELETE /payments/{id}
+
+📅 Payment Due
+GET    /students/{studentId}/next-payment
+POST   /payments/{id}/send-reminder
+GET    /payments/statistics
+
+
+Auto job:
+
+cron check trước 3 ngày
+
+1️⃣1️⃣ REPORT & STATISTICS MODULE
+GET /reports/teacher-student-count
+GET /reports/class-performance/{classId}
+GET /reports/student-progress/{studentId}
+GET /reports/financial
+GET /reports/class-score-chart/{classId}
+GET /reports/teacher-monthly/{month}
