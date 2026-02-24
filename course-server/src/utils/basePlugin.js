@@ -1,4 +1,5 @@
 import slugify from "slugify"
+import mongoose from 'mongoose'
 
 function softDeletePlugin(schema) {
     schema.add({

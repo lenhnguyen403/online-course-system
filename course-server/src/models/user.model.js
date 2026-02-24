@@ -2,7 +2,6 @@ import mongoose from 'mongoose'
 import { ROLE } from '../constants/Role.js'
 import { ACTIVE_STATUS } from '../constants/ActiveStatus.js'
 import { softDeletePlugin } from '../utils/basePlugin.js'
- from 'mongoose-delete'
 
 const userSchema = new mongoose.Schema(
     {

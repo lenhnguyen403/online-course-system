@@ -1,13 +1,15 @@
 const generateToken = (req, res) => {
+    let token;
 
+    
 }
 
-const refreshToken = (req, res) => { 
+const refreshToken = (req, res) => {
 
 };
 
-const verifyToken = (req, res) => { 
-    
+const verifyToken = (req, res) => {
+
 };
 
 

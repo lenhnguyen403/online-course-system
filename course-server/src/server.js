@@ -1,21 +1,24 @@
 import express from 'express';
+import chalk from 'chalk';
 import dotenv from 'dotenv'
 import cors from 'cors'
 import router from './routes/index.js'
 import * as cf from './config/index.js'
 import morgan from 'morgan';
+import { notFoundMiddleware } from './middlewares/notfound.middleware.js'
+import { errorMiddleware } from './middlewares/error.middleware.js'
 
 const app = express();
-dotenv.config()
-
 const port = process.env.PORT || 3003;
+
+dotenv.config()
 
 cf.connectDB()
 cf.connectCloudinary()
 
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
 app.use(cors({ origin: '*', credentials: true }))
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 if (process.env.NODE_ENV === 'development') {
     app.use(morgan('dev'))
@@ -27,6 +30,11 @@ app.get('/', (req, res) => {
     res.send('This is the Online Course System server.');
 });
 
+app.use(notFoundMiddleware);
+app.use(errorMiddleware);
+
 app.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
+    console.log("=============================================");
+    console.log('Server is running on ' + chalk.blueBright.bold.underline(`http://localhost:${port}`));
+    console.log("=============================================");
 });

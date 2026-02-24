@@ -1,13 +1,18 @@
 import express from 'express';
-import { login, register } from '../controllers/auth.controller.js';
+import {
+    login,
+    logout,
+    refreshToken,
+    forgotPassword,
+    resetPassword
+} from '../controllers/auth/auth.controller.js';
 
 const authRouter = express.Router();
 
-authRouter.get('/', (req, res) => {
-    res.send('Auth route is working!');
-});
-
 authRouter.post('/login', login);
-authRouter.post('/register', register);
+authRouter.post('/logout', logout);
+authRouter.post('/refresh-token', refreshToken);
+authRouter.post('/forgot-password', forgotPassword);
+authRouter.post('/reset-password', resetPassword);
 
 export default authRouter;

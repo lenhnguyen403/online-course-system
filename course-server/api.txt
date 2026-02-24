@@ -1,0 +1,148 @@
+API_PREFIX:
+
+/api/v1
+
+1️⃣ AUTH MODULE
+POST   /auth/login
+POST   /auth/logout
+POST   /auth/refresh-token
+POST   /auth/forgot-password
+POST   /auth/reset-password
+
+2️⃣ PROFILE (Không truyền id linh tinh)
+GET    /me
+PUT    /me
+PUT    /me/change-password
+GET    /me/classes
+GET    /me/payments
+GET    /me/results
+GET    /me/journals
+
+3️⃣ USER MANAGEMENT (ADMIN)
+GET    /users?page=0&size=10&role=TEACHER
+POST   /users
+GET    /users/{id}
+PUT    /users/{id}
+PATCH  /users/{id}/status
+PATCH  /users/{id}/deactivate
+POST   /users/{id}/send-credentials
+
+
+Role:
+
+ADMIN
+TEACHER
+STUDENT
+ACADEMIC_STAFF
+
+4️⃣ SUBJECT MANAGEMENT
+GET    /subjects?page=0&size=10
+POST   /subjects
+GET    /subjects/{id}
+PUT    /subjects/{id}
+PATCH  /subjects/{id}/deactivate
+
+5️⃣ CLASS MANAGEMENT
+GET    /classes?page=0&size=10
+POST   /classes
+GET    /classes/{id}
+PUT    /classes/{id}
+PATCH  /classes/{id}/deactivate
+
+👥 Student Enrollment
+GET    /classes/{classId}/students?page=0&size=10&status=ACTIVE
+POST   /classes/{classId}/students
+GET    /classes/{classId}/students/{studentId}
+PATCH  /classes/{classId}/students/{studentId}
+PATCH  /classes/{classId}/students/{studentId}/status
+DELETE /classes/{classId}/students/{studentId}
+
+
+Status:
+
+ACTIVE
+SUSPENDED
+TRANSFER_PENDING
+DROPPED
+
+👨‍🏫 Assign Teacher
+GET    /classes/{classId}/teachers
+POST   /classes/{classId}/teachers
+DELETE /classes/{classId}/teachers/{teacherId}
+
+
+6️⃣ JOURNAL MODULE
+📘 Class Journal
+GET    /classes/{classId}/journals?page=0&size=10
+POST   /classes/{classId}/journals
+GET    /classes/{classId}/journals/{journalId}
+DELETE /classes/{classId}/journals/{journalId}
+
+
+System auto:
+
+createdDate
+
+teacherName
+
+📗 Student Journal
+GET    /students/{studentId}/journals?page=0&size=10
+POST   /students/{studentId}/journals
+GET    /students/{studentId}/journals/{journalId}
+DELETE /students/{studentId}/journals/{journalId}
+
+7️⃣ EXAM MODULE
+Exams
+GET    /classes/{classId}/exams
+POST   /classes/{classId}/exams
+GET    /exams/{examId}
+PUT    /exams/{examId}
+DELETE /exams/{examId}
+
+📝 Exam Results
+GET    /exams/{examId}/results?page=0&size=20
+POST   /exams/{examId}/results
+POST   /exams/{examId}/results/bulk
+PUT    /exams/{examId}/results/{studentId}
+GET    /students/{studentId}/results
+GET    /students/{studentId}/average-score
+GET    /classes/{classId}/average-score
+
+8️⃣ PAYMENT MODULE
+GET    /students/{studentId}/payments?page=0&size=10
+POST   /students/{studentId}/payments
+PUT    /payments/{paymentId}
+PATCH  /payments/{paymentId}/status
+
+
+Status:
+
+PAID
+UNPAID
+OVERDUE
+
+📅 Next Payment & Reminder
+GET    /students/{studentId}/next-payment
+POST   /payments/{paymentId}/send-reminder   (manual trigger)
+
+
+System job:
+
+cron: check due_date - 3 days
+
+9️⃣ REPORT MODULE
+GET /reports/teacher-student-count
+GET /reports/class-performance/{classId}
+GET /reports/student-progress/{studentId}
+GET /reports/financial
+GET /reports/class-score-chart/{classId}
+GET /reports/teacher-monthly/{month}
+
+🔟 OPTIONAL (Production-Ready Enhancement)
+Audit Log
+GET /audit-logs?page=0&size=20
+
+Dashboard Summary
+GET /dashboard/admin
+GET /dashboard/teacher
+GET /dashboard/student
