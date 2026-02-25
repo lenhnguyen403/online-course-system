@@ -4,8 +4,8 @@ import { PAYMENT_STATUS } from '../constants/PaymentStatus.js';
 
 const paymentSchema = new mongoose.Schema(
     {
-        studentId: { type: Schema.Types.ObjectId, ref: "User", required: true },
-        classId: { type: Schema.Types.ObjectId, ref: "Class", required: true },
+        studentId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+        classId: { type: mongoose.Schema.Types.ObjectId, ref: "Class", required: true },
         amount: { type: Number, required: true },
         dueDate: { type: Date, required: true },
         paidDate: Date,

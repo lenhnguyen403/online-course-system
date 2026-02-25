@@ -1,6 +1,11 @@
+// import dotenv from 'dotenv'
+// dotenv.config()
+// Hoac
+import 'dotenv/config';
+
+import 'express-async-errors';
 import express from 'express';
 import chalk from 'chalk';
-import dotenv from 'dotenv'
 import cors from 'cors'
 import router from './routes/index.js'
 import * as cf from './config/index.js'
@@ -8,10 +13,9 @@ import morgan from 'morgan';
 import { notFoundMiddleware } from './middlewares/notfound.middleware.js'
 import { errorMiddleware } from './middlewares/error.middleware.js'
 
+
 const app = express();
 const port = process.env.PORT || 3003;
-
-dotenv.config()
 
 cf.connectDB()
 cf.connectCloudinary()

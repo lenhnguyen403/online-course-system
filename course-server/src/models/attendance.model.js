@@ -3,7 +3,7 @@ import { ATTENDANCE_STATUS } from '../constants/AttendanceStatus.js'
 
 const attendanceRecordSchema = new mongoose.Schema(
     {
-        studentId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+        studentId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
         status: {
             type: String,
             enum: [
@@ -19,10 +19,10 @@ const attendanceRecordSchema = new mongoose.Schema(
 
 const attendanceSchema = new mongoose.Schema(
     {
-        classId: { type: Schema.Types.ObjectId, ref: "Class", required: true },
+        classId: { type: mongoose.Schema.Types.ObjectId, ref: "Class", required: true },
         date: { type: Date, required: true },
         records: [attendanceRecordSchema],
-        createdBy: { type: Schema.Types.ObjectId, ref: "User", required: true },
+        createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     },
     { timestamps: true }
 );

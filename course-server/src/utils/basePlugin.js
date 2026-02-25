@@ -8,11 +8,10 @@ function softDeletePlugin(schema) {
         deletedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     });
 
-    schema.pre(/^find/, function (next) {
+    schema.pre(/^find/, function () {
         if (!this.getQuery().includeDeleted) {
             this.where({ isDeleted: false });
         }
-        next();
     });
 
     schema.methods.softDelete = function (userId) {

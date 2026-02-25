@@ -4,8 +4,8 @@ import { ENROLL_STATUS } from '../constants/EnrollStatus.js'
 
 const enrollmentSchema = new mongoose.Schema(
     {
-        classId: { type: Schema.Types.ObjectId, ref: "Class", required: true },
-        studentId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+        classId: { type: mongoose.Schema.Types.ObjectId, ref: "Class", required: true },
+        studentId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
         status: {
             type: String,
             enum: [

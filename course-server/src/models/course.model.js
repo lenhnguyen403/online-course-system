@@ -1,11 +1,11 @@
 import mongoose from 'mongoose'
-import { slugPlugin, softDeletePlugin } from '../utils/basePlugin'
+import { slugPlugin, softDeletePlugin } from '../utils/basePlugin.js'
 
 const courseSchema = new mongoose.Schema(
     {
         courseCode: { type: String, required: true, unique: true },
         courseName: { type: String, required: true },
-        subjectId: { type: Schema.Types.ObjectId, ref: "Subject", required: true },
+        subjectId: { type: mongoose.Schema.Types.ObjectId, ref: "Subject", required: true },
         durationInMonths: { type: Number, required: true },
         tuitionFee: { type: Number, required: true },
     },

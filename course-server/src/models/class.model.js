@@ -1,12 +1,12 @@
 import mongoose from 'mongoose'
-import { slugPlugin, softDeletePlugin } from '../utils/basePlugin'
-import { CLASS_STATUS } from '../constants/ClassStatus'
+import { slugPlugin, softDeletePlugin } from '../utils/basePlugin.js'
+import { CLASS_STATUS } from '../constants/ClassStatus.js'
 
 const classSchema = new mongoose.Schema(
     {
         classCode: { type: String, required: true, unique: true },
         className: { type: String, required: true },
-        courseId: { type: Schema.Types.ObjectId, ref: "Course", required: true },
+        courseId: { type: mongoose.Schema.Types.ObjectId, ref: "Course", required: true },
         startDate: Date,
         endDate: Date,
         status: {
@@ -19,7 +19,7 @@ const classSchema = new mongoose.Schema(
             default: CLASS_STATUS.UPCOMMING,
         },
         teacherIds: [
-            { type: Schema.Types.ObjectId, ref: "User" }
+            { type: mongoose.Schema.Types.ObjectId, ref: "User" }
         ],
     },
     { timestamps: true }

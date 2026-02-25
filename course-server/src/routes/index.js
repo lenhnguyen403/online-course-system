@@ -1,6 +1,7 @@
 import express from 'express';
 import chalk from 'chalk';
 import authRouter from './auth.route.js';
+import profileRouter from './profile.route.js';
 import userRouter from './user.route.js';
 import subjectRouter from './subject.route.js';
 import classRouter from './class.route.js';
@@ -14,6 +15,7 @@ const API_PREFIX = process.env.API_PREFIX || '/api/v1';
 
 const router = (app) => {
     app.use(`${API_PREFIX}/auth`, authRouter);
+    app.use(`${API_PREFIX}/me`, profileRouter);
     app.use(`${API_PREFIX}/users`, userRouter);
     app.use(`${API_PREFIX}/subjects`, subjectRouter);
     app.use(`${API_PREFIX}/classes`, classRouter);

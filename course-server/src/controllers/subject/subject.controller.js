@@ -1,26 +1,26 @@
+import * as subjectService from '../../services/subject.service.js';
 
-
-// GET    /subjects
 export const getSubjects = async (req, res) => {
+    const result = await subjectService.getSubjects(req.pagination);
+    return res.status(200).json(result);
+};
 
-}
-
-// POST   /subjects
 export const createSubject = async (req, res) => {
+    const subject = await subjectService.createSubject(req.body);
+    return res.status(201).json(subject);
+};
 
-}
-
-// GET    /subjects/:id
 export const getSubjectById = async (req, res) => {
+    const subject = await subjectService.getSubjectById(req.params.id);
+    return res.status(200).json(subject);
+};
 
-}
-
-// PUT    /subjects/:id
 export const updateSubject = async (req, res) => {
+    const subject = await subjectService.updateSubject(req.params.id, req.body);
+    return res.status(200).json(subject);
+};
 
-}
-
-// PATCH  /subjects/:id/deactivate
 export const deactivateSubject = async (req, res) => {
-
-}
+    const subject = await subjectService.deactivateSubject(req.params.id, req.user?.id);
+    return res.status(200).json(subject);
+};

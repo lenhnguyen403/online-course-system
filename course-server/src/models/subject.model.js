@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import { slugPlugin, softDeletePlugin } from '../utils/basePlugin'
+import { slugPlugin, softDeletePlugin } from '../utils/basePlugin.js'
 
 const subjectSchema = new mongoose.Schema(
     {

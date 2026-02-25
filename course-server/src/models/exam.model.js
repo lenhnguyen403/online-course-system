@@ -4,7 +4,7 @@ import { EXAM_TYPE } from '../constants/ExamType.js'
 
 const examSchema = new mongoose.Schema(
     {
-        classId: { type: Schema.Types.ObjectId, ref: "Class", required: true },
+        classId: { type: mongoose.Schema.Types.ObjectId, ref: "Class", required: true },
         title: { type: String, required: true },
         examType: {
             type: String,

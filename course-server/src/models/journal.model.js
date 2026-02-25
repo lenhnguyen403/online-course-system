@@ -7,9 +7,9 @@ const journalSchema = new mongoose.Schema(
             enum: ["CLASS", "STUDENT"],
             required: true,
         },
-        classId: { type: Schema.Types.ObjectId, ref: "Class" },
-        studentId: { type: Schema.Types.ObjectId, ref: "User" },
-        teacherId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+        classId: { type: mongoose.Schema.Types.ObjectId, ref: "Class" },
+        studentId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+        teacherId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
         content: { type: String, required: true },
     },
     { timestamps: true }

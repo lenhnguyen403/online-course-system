@@ -2,7 +2,7 @@ import mongoose from 'mongoose'
 
 const teacherSnapshotSchema = new mongoose.Schema(
     {
-        teacherId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+        teacherId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
         month: { type: String, required: true }, // "2026-02"
         totalClasses: Number,
         totalStudents: Number,
