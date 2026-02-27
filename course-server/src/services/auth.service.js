@@ -48,7 +48,16 @@ export const login = async ({ email, password }) => {
         expiredAt: decoded ? new Date(decoded.exp * 1000) : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     });
 
-    return { accessToken, refreshToken, user: { id: user._id, email: user.email, fullName: user.fullName, role: user.role } };
+    return {
+        accessToken,
+        refreshToken,
+        user: {
+            id: user._id,
+            email: user.email,
+            fullName: user.fullName,
+            role: user.role
+        }
+    };
 };
 
 export const refreshTokenService = async (token) => {

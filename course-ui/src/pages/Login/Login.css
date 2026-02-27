@@ -1,0 +1,7 @@
+.login {
+    background: url('../../assets/bg-image.jpg') no-repeat center center/cover;
+}
+
+.login-overlay {
+    background: rgba(0, 0, 0, 0.59);
+}
