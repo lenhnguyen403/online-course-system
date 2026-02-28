@@ -4,25 +4,31 @@ import { useState } from 'react'
 import { axiosClient } from '../../utils/axiosClient'
 
 const Login = () => {
-    const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
-    // const [token, setToken] = useState('')
     // const navigate = useNavigate()
+    // const [error, setError] = useState('')
+    const [formData, setFormData] = useState({
+        email: '',
+        password: ''
+    })
 
+    const handleChange = (e) => {
+        const { name, value } = e.target
+        setFormData({ ...formData, [name]: value })
+    }
     const handleSubmit = async (e) => {
         e.preventDefault()  // Ngăn chặn hành vi mặc định của form (tải lại trang)
 
         try {
-            const response = await axiosClient.post(`/auth/login`, { email, password })
+            const response = await axiosClient.post(`/auth/login`, formData)
 
             // console.log(response.data);
+            const data = response.data
 
             // Lưu token vào localStorage
-            if (response.data.accessToken && response.data.refreshToken) {
-                localStorage.setItem('accessToken', response.data.accessToken);
-                // localStorage.setItem('refreshToken', response.data.refreshToken);
+            if (data && data.accessToken) {
+                localStorage.setItem('accessToken', data.accessToken);
                 // console.log('Tokens stored in localStorage.');
-                // console.log('Token:', response.data.accessToken);
+                // console.log('Token:', data.accessToken);
                 // console.log('After set:', localStorage.getItem('accessToken'));
                 // console.log('All storage:', { ...localStorage });
 
@@ -52,9 +58,11 @@ const Login = () => {
                                 className='form-control p-2 w-full border border-gray-300 focus:border-cyan-600 
                                     outline-none transition rounded'
                                 id="email"
+                                name='email'
                                 placeholder='Enter Your Email'
                                 required
-                                onChange={(e) => setEmail(e.target.value)} />
+                                value={formData.email}
+                                onChange={handleChange} />
                         </div>
                         <div className="form-group mb-4">
                             <label htmlFor="password" className='inline-block mb-2'>Password</label>
@@ -62,9 +70,11 @@ const Login = () => {
                                 className='form-control p-2 w-full border border-gray-300 focus:border-cyan-600 
                                     outline-none transition rounded'
                                 id="password"
+                                name='password'
                                 placeholder='Enter Your Password'
                                 required
-                                onChange={(e) => setPassword(e.target.value)} />
+                                value={formData.password}
+                                onChange={handleChange} />
                         </div>
                         <button type='submit'
                             className='btn btn-primary p-3 mt-3 mb-2 text-white text-center font-semibold uppercase text-sm 
