@@ -6,9 +6,7 @@ import Footer from '../Footer/Footer'
 const MainLayout = () => {
     return (
         <>
-            <Header>
-                <Link to='/login'>Login</Link>
-            </Header>
+            <Header />
             <Footer />
         </>
     )
