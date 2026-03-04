@@ -2,8 +2,11 @@ import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { axiosClient } from '../../utils/axiosClient'
 import ToastMessage from '../../messages/ToastMessage'
+import PageHeader from '../../components/ui/PageHeader'
+import Badge from '../../components/ui/Badge'
 
 const ENROLL_LABEL = { active: 'Đang học', suspended: 'Đình chỉ', 'transfer pending': 'Chờ chuyển lớp', dropped: 'Thôi học' }
+const ENROLL_BADGE = { active: 'success', suspended: 'warning', 'transfer pending': 'info', dropped: 'danger' }
 const EXAM_TYPE_LABEL = { midterm: 'Giữa kỳ', final: 'Cuối kỳ', quiz: 'Quiz' }
 const TABS = ['Thông tin', 'Học viên', 'Giảng viên', 'Nhật ký', 'Bài thi', 'Điểm']
 
@@ -86,16 +89,11 @@ export default function ClassDetail() {
     if (loading || !classInfo) return <div className="p-4">Đang tải...</div>
 
     return (
-        <div>
-            <div className="flex items-center gap-2 text-sm text-gray-500 mb-4">
-                <Link to="/dashboard/classes">Lớp học</Link>
-                <span>/</span>
-                <span className="text-gray-800">{classInfo.className}</span>
-            </div>
-            <h1 className="text-xl font-bold mb-4">{classInfo.className}</h1>
-            <div className="border-b mb-4 flex gap-2">
+        <div className="space-y-6">
+            <PageHeader breadcrumbs={[{ to: '/dashboard', label: 'Tổng quan' }, { to: '/dashboard/classes', label: 'Lớp học' }, { label: classInfo.className }]} title={classInfo.className} description={classInfo.classCode} />
+            <div className="border-b border-slate-200 flex gap-1 overflow-x-auto">
                 {TABS.map((t, i) => (
-                    <button key={t} type="button" onClick={() => setTab(i)} className={`px-4 py-2 border-b-2 -mb-px ${tab === i ? 'border-orange-500 text-orange-600' : 'border-transparent'}`}>{t}</button>
+                    <button key={t} type="button" onClick={() => setTab(i)} className={`px-4 py-3 font-medium rounded-t-xl border-b-2 -mb-px whitespace-nowrap transition-colors ${tab === i ? 'border-orange-500 text-orange-600 bg-orange-50/50' : 'border-transparent text-slate-600 hover:bg-slate-50'}`}>{t}</button>
                 ))}
             </div>
 
@@ -133,7 +131,7 @@ export default function ClassDetail() {
                                                 {Object.entries(ENROLL_LABEL).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
                                             </select>
                                         ) : (
-                                            <span>{ENROLL_LABEL[en.status] || en.status}</span>
+                                            <Badge variant={ENROLL_BADGE[en.status] || 'neutral'}>{ENROLL_LABEL[en.status] || en.status}</Badge>
                                         )}
                                         {statusEdit[en.studentId?._id] !== undefined ? (
                                             <button type="button" onClick={() => handleUpdateStatus(en.studentId._id, statusEdit[en.studentId._id])} className="ml-2 text-orange-600 text-xs">Lưu</button>

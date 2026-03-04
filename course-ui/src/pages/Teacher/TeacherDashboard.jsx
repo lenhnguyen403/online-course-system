@@ -2,45 +2,60 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { axiosClient } from '../../utils/axiosClient'
 import ToastMessage from '../../messages/ToastMessage'
+import PageHeader from '../../components/ui/PageHeader'
+import StatCard from '../../components/ui/StatCard'
+import EmptyState from '../../components/ui/EmptyState'
+import LoadingSpinner from '../../components/ui/LoadingSpinner'
+import { FaChalkboardTeacher, FaUsers, FaBookOpen } from 'react-icons/fa'
 
 export default function TeacherDashboard() {
-    const [data, setData] = useState(null)
-    const [loading, setLoading] = useState(true)
+  const [data, setData] = useState(null)
+  const [loading, setLoading] = useState(true)
 
-    useEffect(() => {
-        axiosClient.get('/dashboard/teacher')
-            .then((res) => setData(res.data))
-            .catch(ToastMessage.error)
-            .finally(() => setLoading(false))
-    }, [])
+  useEffect(() => {
+    axiosClient.get('/dashboard/teacher').then((res) => setData(res.data)).catch(ToastMessage.error).finally(() => setLoading(false))
+  }, [])
 
-    if (loading) return <div className="flex items-center justify-center py-12"><div className="w-8 h-8 border-2 border-rose-500 border-t-transparent rounded-full animate-spin" /></div>
+  if (loading) return <LoadingSpinner />
 
-    return (
-        <div className="space-y-8">
-            <h1 className="text-2xl font-bold text-slate-800">Tổng quan giảng viên</h1>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                <div className="card card-body">
-                    <div className="text-slate-500 text-sm font-medium">Số lớp đang dạy</div>
-                    <div className="text-3xl font-bold text-rose-600 mt-1">{data?.totalClasses ?? 0}</div>
-                </div>
-                <div className="card card-body">
-                    <div className="text-slate-500 text-sm font-medium">Tổng học viên</div>
-                    <div className="text-3xl font-bold text-rose-600 mt-1">{data?.totalStudents ?? 0}</div>
-                </div>
+  const classes = data?.classes || []
+
+  return (
+    <div className="space-y-8">
+      <PageHeader breadcrumbs={[{ label: 'Tổng quan' }]} title="Tổng quan giảng viên" description="Số lớp đang dạy và danh sách lớp của bạn." />
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <StatCard icon={FaBookOpen} label="Số lớp đang dạy" value={data?.totalClasses ?? 0} variant="rose" />
+        <StatCard icon={FaUsers} label="Tổng học viên" value={data?.totalStudents ?? 0} variant="rose" />
+      </div>
+
+      <section>
+        <h2 className="text-lg font-bold text-slate-800 mb-4">Lớp của tôi</h2>
+        {classes.length === 0 ? (
+          <div className="card">
+            <EmptyState icon={FaChalkboardTeacher} title="Chưa có lớp nào" description="Bạn chưa được phân công lớp. Liên hệ admin hoặc giáo vụ." />
+          </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {classes.slice(0, 6).map((c) => (
+                <Link key={c._id} to={`/teacher/classes/${c._id}`} className="group flex items-center gap-4 p-5 rounded-xl border border-slate-200 bg-white hover:border-rose-300 hover:shadow-lg transition-all">
+                  <div className="w-12 h-12 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center shrink-0 group-hover:bg-rose-200 transition-colors">
+                    <FaBookOpen className="text-xl" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-bold text-slate-800 group-hover:text-rose-700">{c.className}</p>
+                    <p className="text-sm text-slate-500">{c.classCode} · {c.courseId?.courseName || '-'}</p>
+                  </div>
+                </Link>
+              ))}
             </div>
-            <section>
-                <h2 className="text-lg font-bold text-slate-800 mb-4">Lớp của tôi</h2>
-                <div className="grid gap-3">
-                    {(data?.classes || []).slice(0, 5).map((c) => (
-                        <Link key={c._id} to={`/teacher/classes/${c._id}`} className="card card-body hover:shadow-md hover:border-rose-200 transition-all">
-                            <div className="font-semibold text-slate-800">{c.className}</div>
-                            <div className="text-sm text-slate-500">{c.classCode} · {c.courseId?.courseName || '-'}</div>
-                        </Link>
-                    ))}
-                </div>
-                {(data?.classes?.length || 0) > 5 && <Link to="/teacher/classes" className="inline-block mt-3 text-rose-600 font-medium hover:underline">Xem tất cả lớp →</Link>}
-            </section>
-        </div>
-    )
+            {classes.length > 6 && (
+              <Link to="/teacher/classes" className="inline-flex items-center gap-2 mt-4 text-rose-600 font-semibold hover:underline">Xem tất cả lớp →</Link>
+            )}
+          </>
+        )}
+      </section>
+    </div>
+  )
 }

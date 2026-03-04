@@ -35,7 +35,7 @@ function slugPlugin(schema, fieldName) {
         slug: { type: String, unique: true, index: true },
     });
 
-    schema.pre("save", async function (next) {
+    schema.pre("save", async function () {
         if (this.isModified(fieldName)) {
             let baseSlug = slugify(this[fieldName], {
                 lower: true,
@@ -51,7 +51,6 @@ function slugPlugin(schema, fieldName) {
 
             this.slug = slug;
         }
-        next();
     });
 }
 

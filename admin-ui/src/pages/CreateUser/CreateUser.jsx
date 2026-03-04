@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { axiosClient } from '../../utils/axiosClient'
 import ToastMessage from '../../messages/ToastMessage'
+import PageHeader from '../../components/ui/PageHeader'
 
 const ROLES = [
     { value: 'teacher', label: 'Giảng viên' },
@@ -67,67 +68,58 @@ const CreateUser = () => {
     }
 
     return (
-        <div className="max-w-xl mx-auto">
-            <h1 className="text-xl font-bold mb-4">Tạo tài khoản</h1>
-            <form onSubmit={handleSubmit} className="space-y-3 bg-white p-4 rounded shadow">
+        <div className="max-w-2xl mx-auto">
+            <PageHeader breadcrumbs={[{ to: '/dashboard', label: 'Tổng quan' }, { label: 'Tạo tài khoản' }]} title="Tạo tài khoản" description="Casestudy #1: Tạo tài khoản cho giảng viên, học viên hoặc giáo vụ. Mật khẩu 6–8 ký tự." />
+            <form onSubmit={handleSubmit} className="card overflow-hidden">
+                <div className="card-body space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label className="block text-sm font-medium mb-1">Email (*)</label>
-                    <input type="email" name="email" required value={formData.email} onChange={handleChange}
-                        className="w-full border border-gray-300 rounded px-3 py-2" placeholder="email@example.com" />
+                    <label className="block text-sm font-medium text-slate-700 mb-1.5">Email (*)</label>
+                    <input type="email" name="email" required value={formData.email} onChange={handleChange} className="w-full rounded-xl border border-slate-200 px-4 py-2.5" placeholder="email@example.com" />
                 </div>
                 <div>
-                    <label className="block text-sm font-medium mb-1">Mật khẩu (*) - 6 đến 8 ký tự</label>
-                    <input type="password" name="password" required value={formData.password} onChange={handleChange}
-                        className="w-full border border-gray-300 rounded px-3 py-2" minLength={6} maxLength={8} />
-                </div>
-                <div>
-                    <label className="block text-sm font-medium mb-1">Xác nhận mật khẩu (*)</label>
-                    <input type="password" name="rePassword" required value={formData.rePassword} onChange={handleChange}
-                        className="w-full border border-gray-300 rounded px-3 py-2" />
-                </div>
-                <div>
-                    <label className="block text-sm font-medium mb-1">Số điện thoại (*)</label>
-                    <input type="text" name="phoneNumber" required value={formData.phoneNumber} onChange={handleChange}
-                        className="w-full border border-gray-300 rounded px-3 py-2" />
-                </div>
-                <div>
-                    <label className="block text-sm font-medium mb-1">Họ tên (*)</label>
-                    <input type="text" name="fullName" required value={formData.fullName} onChange={handleChange}
-                        className="w-full border border-gray-300 rounded px-3 py-2" />
-                </div>
-                <div>
-                    <label className="block text-sm font-medium mb-1">Ngày sinh (*)</label>
-                    <input type="date" name="dateOfBirth" required value={formData.dateOfBirth} onChange={handleChange}
-                        className="w-full border border-gray-300 rounded px-3 py-2" />
-                </div>
-                <div>
-                    <label className="block text-sm font-medium mb-1">Địa chỉ (*)</label>
-                    <input type="text" name="address" required value={formData.address} onChange={handleChange}
-                        className="w-full border border-gray-300 rounded px-3 py-2" />
-                </div>
-                <div>
-                    <label className="block text-sm font-medium mb-1">CMND/CCCD (*)</label>
-                    <input type="text" name="identityNumber" required value={formData.identityNumber} onChange={handleChange}
-                        className="w-full border border-gray-300 rounded px-3 py-2" />
-                </div>
-                <div>
-                    <label className="block text-sm font-medium mb-1">Vai trò (*)</label>
-                    <select name="role" required value={formData.role} onChange={handleChange}
-                        className="w-full border border-gray-300 rounded px-3 py-2">
-                        {ROLES.map((r) => (
-                            <option key={r.value} value={r.value}>{r.label}</option>
-                        ))}
+                    <label className="block text-sm font-medium text-slate-700 mb-1.5">Vai trò (*)</label>
+                    <select name="role" required value={formData.role} onChange={handleChange} className="w-full rounded-xl border border-slate-200 px-4 py-2.5">
+                        {ROLES.map((r) => <option key={r.value} value={r.value}>{r.label}</option>)}
                     </select>
                 </div>
-                <div className="flex gap-2 pt-2">
-                    <button type="submit" disabled={loading}
-                        className="px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600 disabled:opacity-50">
-                        {loading ? 'Đang tạo...' : 'Tạo tài khoản'}
-                    </button>
-                    <button type="button" onClick={() => navigate('/dashboard')}
-                        className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100">
-                        Hủy
-                    </button>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1.5">Mật khẩu (*) — 6 đến 8 ký tự</label>
+                    <input type="password" name="password" required value={formData.password} onChange={handleChange} className="w-full rounded-xl border border-slate-200 px-4 py-2.5" minLength={6} maxLength={8} />
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1.5">Xác nhận mật khẩu (*)</label>
+                    <input type="password" name="rePassword" required value={formData.rePassword} onChange={handleChange} className="w-full rounded-xl border border-slate-200 px-4 py-2.5" />
+                </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1.5">Họ tên (*)</label>
+                    <input type="text" name="fullName" required value={formData.fullName} onChange={handleChange} className="w-full rounded-xl border border-slate-200 px-4 py-2.5" />
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1.5">Số điện thoại (*)</label>
+                    <input type="text" name="phoneNumber" required value={formData.phoneNumber} onChange={handleChange} className="w-full rounded-xl border border-slate-200 px-4 py-2.5" />
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1.5">Ngày sinh (*)</label>
+                    <input type="date" name="dateOfBirth" required value={formData.dateOfBirth} onChange={handleChange} className="w-full rounded-xl border border-slate-200 px-4 py-2.5" />
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1.5">CMND/CCCD (*)</label>
+                    <input type="text" name="identityNumber" required value={formData.identityNumber} onChange={handleChange} className="w-full rounded-xl border border-slate-200 px-4 py-2.5" />
+                </div>
+                <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-slate-700 mb-1.5">Địa chỉ (*)</label>
+                    <input type="text" name="address" required value={formData.address} onChange={handleChange} className="w-full rounded-xl border border-slate-200 px-4 py-2.5" />
+                </div>
+                </div>
+                <div className="flex gap-3 pt-4 border-t border-slate-200">
+                    <button type="submit" disabled={loading} className="px-5 py-2.5 bg-orange-500 text-white font-semibold rounded-xl hover:bg-orange-600 disabled:opacity-50">{loading ? 'Đang tạo...' : 'Tạo tài khoản'}</button>
+                    <button type="button" onClick={() => navigate('/dashboard')} className="px-5 py-2.5 border border-slate-200 font-medium rounded-xl hover:bg-slate-50 text-slate-700">Hủy</button>
+                </div>
                 </div>
             </form>
         </div>

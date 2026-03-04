@@ -16,8 +16,7 @@ const userSchema = new mongoose.Schema(
         password: {
             type: String,
             required: true,
-            minlength: 6,
-            maxlength: 8,
+            maxlength: 128, /* Lưu bcrypt hash (~60 ký tự). Validate 6-8 ký tự mật khẩu gốc ở user.service */
         },
         phoneNumber: {
             type: String,
