@@ -20,6 +20,16 @@ export const getClassDashboard = async (req, res) => {
     return res.status(200).json(data);
 };
 
+export const getClassScoreChart = async (req, res) => {
+    const data = await dashboardService.getClassScoreChart(req.params.classId);
+    return res.status(200).json(data);
+};
+
+export const generateTeacherSnapshot = async (req, res) => {
+    const data = await dashboardService.generateTeacherSnapshot();
+    return res.status(200).json(data);
+};
+
 export const getAuditLogs = async (req, res) => {
     const data = await dashboardService.getAuditLogs(req.pagination);
     return res.status(200).json(data);

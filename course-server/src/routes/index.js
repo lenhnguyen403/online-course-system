@@ -4,6 +4,7 @@ import authRouter from './auth.route.js';
 import profileRouter from './profile.route.js';
 import userRouter from './user.route.js';
 import subjectRouter from './subject.route.js';
+import courseRouter from './course.route.js';
 import classRouter from './class.route.js';
 import journalRouter from './journal.route.js';
 import examRouter from './exam.route.js';
@@ -18,6 +19,7 @@ const router = (app) => {
     app.use(`${API_PREFIX}/me`, profileRouter);
     app.use(`${API_PREFIX}/users`, userRouter);
     app.use(`${API_PREFIX}/subjects`, subjectRouter);
+    app.use(`${API_PREFIX}/courses`, courseRouter);
     app.use(`${API_PREFIX}/classes`, classRouter);
     app.use(`${API_PREFIX}/journals`, journalRouter);
     app.use(`${API_PREFIX}/exams`, examRouter);

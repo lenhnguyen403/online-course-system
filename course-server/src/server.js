@@ -15,14 +15,19 @@ import { errorMiddleware } from './middlewares/error.middleware.js'
 
 
 const app = express();
-const port = process.env.PORT || 3003;
+const port = process.env.PORT || 5000;
 
 cf.connectDB()
 cf.connectCloudinary()
 
+const allowedOrigins = [
+    'http://localhost:5173',
+    'http://localhost:5174',
+]
+
 app.use(cors(
     {
-        origin: 'http://localhost:5173',
+        origin: allowedOrigins,
         // credentials: true
     }
 ))

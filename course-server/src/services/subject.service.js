@@ -13,6 +13,8 @@ export const getSubjects = async (pagination, filter = {}) => {
 };
 
 export const createSubject = async (body) => {
+    if (!body.subjectCode?.trim()) throw { status: 400, message: 'SubjectId (subjectCode) is required' };
+    if (!body.subjectName?.trim()) throw { status: 400, message: 'SubjectName is required' };
     const subject = await Subject.create(body);
     return subject;
 };

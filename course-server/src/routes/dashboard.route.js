@@ -7,6 +7,8 @@ import {
     getTeacherDashboard,
     getStudentDashboard,
     getClassDashboard,
+    getClassScoreChart,
+    generateTeacherSnapshot,
     getAuditLogs,
 } from '../controllers/dashboard/dashboard.controller.js';
 
@@ -19,5 +21,7 @@ dashboardRouter.get('/admin', authMiddleware('admin', 'staff'), getAdminDashboar
 dashboardRouter.get('/teacher', authMiddleware('admin', 'staff', 'teacher'), getTeacherDashboard);
 dashboardRouter.get('/student', authMiddleware('admin', 'staff', 'student'), getStudentDashboard);
 dashboardRouter.get('/class', authMiddleware('admin', 'staff'), getClassDashboard);
+dashboardRouter.get('/class/:classId/score-chart', authMiddleware('admin', 'staff'), getClassScoreChart);
+dashboardRouter.post('/teacher-snapshot', authMiddleware('admin'), generateTeacherSnapshot);
 
 export default dashboardRouter;

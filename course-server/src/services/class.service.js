@@ -26,9 +26,13 @@ export const createClass = async (body) => {
     return cls;
 };
 
-export const getClassById = async (id) => {
+export const getClassById = async (id, role, userId) => {
     const cls = await Class.findById(id).populate('courseId').populate('teacherIds', 'fullName email');
     if (!cls) throw { status: 404, message: 'Class not found' };
+    if (role === 'teacher' && userId) {
+        const isMyClass = cls.teacherIds?.some((t) => t._id?.toString() === userId.toString());
+        if (!isMyClass) throw { status: 403, message: 'Forbidden' };
+    }
     return cls;
 };
 

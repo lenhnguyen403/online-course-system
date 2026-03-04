@@ -1,17 +1,11 @@
-import './Login.css'
 import { useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { axiosClient } from '../../utils/axiosClient'
-import AdminDashboard from '../Dashboard/AdminDashboard'
-import TeacherLayout from '../Teacher/TeacherLayout'
-import StudentLayout from '../Student/StudentLayout'
+import { saveToken } from '../../store/storage'
+import ToastMessage from '../../messages/ToastMessage'
 
 const Login = () => {
     const navigate = useNavigate()
-    // const [error, setError] = useState('')
-    const location = useLocation()
-    const isTeacher = location.pathname.includes('/teacher')
-
     const [formData, setFormData] = useState({
         email: '',
         password: ''
@@ -22,91 +16,58 @@ const Login = () => {
         setFormData({ ...formData, [name]: value })
     }
 
+    const isFormValid = formData.email.trim() !== '' && formData.password.trim() !== ''
+
     const handleSubmit = async (e) => {
-        e.preventDefault()  // Ngăn chặn hành vi mặc định của form (tải lại trang)
-
+        e.preventDefault()
         try {
-            const response = await axiosClient.post(`/auth/login`, formData)
-
-            // console.log(response.data);
+            const response = await axiosClient.post('/auth/login', formData)
             const data = response.data
-
-            // Lưu token vào localStorage
             if (data && data.accessToken) {
-                localStorage.setItem('accessToken', data.accessToken);
-                // console.log('Tokens stored in localStorage.');
-                // console.log('Token:', data.accessToken);
-                // console.log('After set:', localStorage.getItem('accessToken'));
-                // console.log('All storage:', { ...localStorage });
-
-                // Kiem tra dang nhap theo role (admin, staff, teacher, student)
-                const role = data.user.role;
-
-                if (role === 'admin' || role === 'staff') {
-                    navigate('/dashboard')
-                } else if (role === 'teacher') {
-                    navigate('/teacher')
-                } else {
-                    navigate('/student')
+                const role = data.user?.role
+                if (role !== 'admin' && role !== 'staff') {
+                    ToastMessage.warning('Trang này dành cho Admin / Giáo vụ. Học viên và Giảng viên đăng nhập tại trang Course.')
+                    return
                 }
-
+                saveToken(data.accessToken, data.refreshToken)
+                if (data.user) localStorage.setItem('user', JSON.stringify(data.user))
+                navigate('/dashboard')
+                ToastMessage.success('Đăng nhập thành công')
             } else {
-                console.error('Tokens not found in response.');
+                ToastMessage.error('Đăng nhập thất bại')
             }
-
         } catch (error) {
-            console.error('Error occurred:', error);
+            ToastMessage.error(error)
         }
     }
 
 
     return (
-        <>
-            <div className={`login relative min-h-screen bg-cover bg-no-repeat bg-center
-                    ${isTeacher
-                    ? 'bg-[url("/bg-teacher-image.png")]'
-                    : 'bg-[url("/bg-image.jpg")]'}`}>
-                <div className={`${isTeacher ? 'login-teacher-overlay' : 'login-overlay'} fixed inset-0`}></div>
-                <div className={`login-form p-7 bg-gray-50  w-full max-w-sm md:max-w-md absolute 
-                    ${isTeacher
-                        ? 'right-0 bottom-0 top-0'
-                        : 'top-2/4 left-2/4 -translate-1/2 rounded-md'}`}>
-                    <form onSubmit={handleSubmit}>
-                        <h2 className='text-center uppercase text-base font-bold'>Login</h2>
-                        <div className="form-group mb-4">
-                            <label htmlFor="email" className='inline-block mb-2'>Email</label>
-                            <input type="text"
-                                className='form-control p-2 w-full border border-gray-300 focus:border-cyan-600 
-                                    outline-none transition rounded'
-                                id="email"
-                                name='email'
-                                placeholder='Enter Your Email'
-                                required
-                                value={formData.email}
-                                onChange={handleChange} />
+        <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-slate-800 via-slate-700 to-orange-900/30">
+            <div className="w-full max-w-md">
+                <div className="card shadow-xl shadow-slate-900/20">
+                    <div className="card-body">
+                        <div className="text-center mb-8">
+                            <h1 className="text-2xl font-bold text-slate-800">Đăng nhập Admin</h1>
+                            <p className="text-slate-500 text-sm mt-1">Dành cho Quản trị viên & Giáo vụ</p>
                         </div>
-                        <div className="form-group mb-4">
-                            <label htmlFor="password" className='inline-block mb-2'>Password</label>
-                            <input type="password"
-                                className='form-control p-2 w-full border border-gray-300 focus:border-cyan-600 
-                                    outline-none transition rounded'
-                                id="password"
-                                name='password'
-                                placeholder='Enter Your Password'
-                                required
-                                value={formData.password}
-                                onChange={handleChange} />
-                        </div>
-                        <button type='submit'
-                            className='btn btn-primary p-3 mt-3 mb-2 text-white text-center font-semibold uppercase text-sm 
-                                bg-cyan-700 hover:bg-cyan-600 transition rounded w-full lg:cursor-pointer '
-                        >
-                            Login
-                        </button>
-                    </form>
+                        <form onSubmit={handleSubmit} className="space-y-5">
+                            <div>
+                                <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-1.5">Email</label>
+                                <input type="email" id="email" name="email" placeholder="admin@example.com" required value={formData.email} onChange={handleChange} className="w-full" />
+                            </div>
+                            <div>
+                                <label htmlFor="password" className="block text-sm font-medium text-slate-700 mb-1.5">Mật khẩu</label>
+                                <input type="password" id="password" name="password" placeholder="••••••••" required value={formData.password} onChange={handleChange} className="w-full" />
+                            </div>
+                            <button type="submit" disabled={!isFormValid} className={`w-full py-3 rounded-xl font-semibold transition-all ${!isFormValid ? 'bg-slate-200 text-slate-400 cursor-not-allowed' : 'btn-primary'}`}>
+                                Đăng nhập
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
-        </>
+        </div>
     )
 }
 

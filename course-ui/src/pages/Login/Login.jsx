@@ -2,9 +2,9 @@ import './Login.css'
 import { useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { axiosClient } from '../../utils/axiosClient'
-import AdminDashboard from '../Dashboard/AdminDashboard'
-import TeacherLayout from '../Teacher/TeacherLayout'
-import StudentLayout from '../Student/StudentLayout'
+import { saveToken } from '../../store/storage'
+import ToastMessage from '../../messages/ToastMessage'
+import { Link } from 'react-router-dom'
 
 const Login = () => {
     const navigate = useNavigate()
@@ -16,6 +16,8 @@ const Login = () => {
         email: '',
         password: ''
     })
+
+    const isFormValid = formData.email.trim() !== '' && formData.password.trim() !== ''
 
     const handleChange = (e) => {
         const { name, value } = e.target
@@ -33,80 +35,73 @@ const Login = () => {
 
             // Lưu token vào localStorage
             if (data && data.accessToken) {
-                localStorage.setItem('accessToken', data.accessToken);
-                // console.log('Tokens stored in localStorage.');
-                // console.log('Token:', data.accessToken);
-                // console.log('After set:', localStorage.getItem('accessToken'));
-                // console.log('All storage:', { ...localStorage });
 
-                // Kiem tra dang nhap theo role (admin, staff, teacher, student)
+                // Kiem tra dang nhap theo role (teacher, student)
                 const role = data.user.role;
 
-                if (role === 'admin' || role === 'staff') {
-                    navigate('/dashboard')
-                } else if (role === 'teacher') {
-                    navigate('/teacher')
-                } else {
-                    navigate('/student')
+                if (isTeacher && role !== 'teacher') {
+                    ToastMessage.warning('This page is only for Teacher')
+                    return
                 }
 
+                if (!isTeacher && role !== 'student') {
+                    ToastMessage.warning('This page is only for Student')
+                    return
+                }
+
+                saveToken(data.accessToken, data.refreshToken)
+                if (data.user) localStorage.setItem('user', JSON.stringify(data.user))
+
+                navigate(role === 'teacher' ? '/teacher' : '/student')
+                ToastMessage.success('Login Successfully')
+
             } else {
+                ToastMessage.error('Login Failed')
                 console.error('Tokens not found in response.');
             }
 
+
         } catch (error) {
+            ToastMessage.error(error)
             console.error('Error occurred:', error);
         }
     }
 
 
     return (
-        <>
-            <div className={`login relative min-h-screen bg-cover bg-no-repeat bg-center
-                    ${isTeacher
-                    ? 'bg-[url("/bg-teacher-image.png")]'
-                    : 'bg-[url("/bg-image.jpg")]'}`}>
-                <div className={`${isTeacher ? 'login-teacher-overlay' : 'login-overlay'} fixed inset-0`}></div>
-                <div className={`login-form p-7 bg-gray-50  w-full max-w-sm md:max-w-md absolute 
-                    ${isTeacher
-                        ? 'right-0 bottom-0 top-0'
-                        : 'top-2/4 left-2/4 -translate-1/2 rounded-md'}`}>
-                    <form onSubmit={handleSubmit}>
-                        <h2 className='text-center uppercase text-base font-bold'>Login</h2>
-                        <div className="form-group mb-4">
-                            <label htmlFor="email" className='inline-block mb-2'>Email</label>
-                            <input type="text"
-                                className='form-control p-2 w-full border border-gray-300 focus:border-cyan-600 
-                                    outline-none transition rounded'
-                                id="email"
-                                name='email'
-                                placeholder='Enter Your Email'
-                                required
-                                value={formData.email}
-                                onChange={handleChange} />
+        <div className={`min-h-screen flex items-center justify-center p-4 ${isTeacher ? 'bg-gradient-to-br from-rose-50 via-white to-rose-50' : 'bg-gradient-to-br from-slate-50 via-white to-cyan-50'}`}>
+            <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%239C92AC\' fill-opacity=\'0.04\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-80" aria-hidden />
+            <div className="relative w-full max-w-md">
+                <div className="card shadow-xl shadow-slate-200/50">
+                    <div className="card-body">
+                        <div className="text-center mb-8">
+                            <h1 className="text-2xl font-bold text-slate-800">{isTeacher ? 'Đăng nhập Giảng viên' : 'Đăng nhập Học viên'}</h1>
+                            <p className="text-slate-500 text-sm mt-1">Email và mật khẩu do trung tâm cấp</p>
                         </div>
-                        <div className="form-group mb-4">
-                            <label htmlFor="password" className='inline-block mb-2'>Password</label>
-                            <input type="password"
-                                className='form-control p-2 w-full border border-gray-300 focus:border-cyan-600 
-                                    outline-none transition rounded'
-                                id="password"
-                                name='password'
-                                placeholder='Enter Your Password'
-                                required
-                                value={formData.password}
-                                onChange={handleChange} />
-                        </div>
-                        <button type='submit'
-                            className='btn btn-primary p-3 mt-3 mb-2 text-white text-center font-semibold uppercase text-sm 
-                                bg-cyan-700 hover:bg-cyan-600 transition rounded w-full lg:cursor-pointer '
-                        >
-                            Login
-                        </button>
-                    </form>
+                        <form onSubmit={handleSubmit} className="space-y-5">
+                            <div>
+                                <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-1.5">Email</label>
+                                <input type="email" id="email" name="email" placeholder="your@email.com" required value={formData.email} onChange={handleChange} className="w-full" />
+                            </div>
+                            <div>
+                                <label htmlFor="password" className="block text-sm font-medium text-slate-700 mb-1.5">Mật khẩu</label>
+                                <input type="password" id="password" name="password" placeholder="••••••••" required value={formData.password} onChange={handleChange} className="w-full" />
+                            </div>
+                            <div className="flex items-center justify-between text-sm">
+                                <label className="inline-flex items-center gap-2 text-slate-600 cursor-pointer"><input type="checkbox" className="rounded border-slate-300 text-orange-500 focus:ring-orange-500" /> Ghi nhớ</label>
+                                <Link to="/" className={`font-medium ${isTeacher ? 'text-rose-600 hover:text-rose-700' : 'text-cyan-600 hover:text-cyan-700'}`}>Quên mật khẩu?</Link>
+                            </div>
+                            <button type="submit" disabled={!isFormValid} className={`w-full py-3 rounded-xl font-semibold transition-all flex items-center justify-center ${!isFormValid ? 'bg-slate-200 text-slate-400 cursor-not-allowed' : isTeacher ? 'bg-rose-500 hover:bg-rose-600 text-white shadow-lg shadow-rose-500/25' : 'bg-cyan-500 hover:bg-cyan-600 text-white shadow-lg shadow-cyan-500/25'}`}>
+                                Đăng nhập
+                            </button>
+                        </form>
+                        <p className="text-center text-slate-500 text-sm mt-6">
+                            {isTeacher ? <>Bạn là học viên? <Link to="/login" className="font-medium text-cyan-600 hover:underline">Đăng nhập tại đây</Link></> : <>Bạn là giảng viên? <Link to="/teacher/login" className="font-medium text-rose-600 hover:underline">Đăng nhập tại đây</Link></>}
+                        </p>
+                    </div>
                 </div>
             </div>
-        </>
+        </div>
     )
 }
 

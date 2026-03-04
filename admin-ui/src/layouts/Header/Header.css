@@ -1,0 +1,10 @@
+.header-submenu {
+    visibility: hidden;
+    opacity: 0;
+    transition: all .3s ease;
+}
+
+.header-submenu.visible {
+    visibility: visible;
+    opacity: 1;
+}

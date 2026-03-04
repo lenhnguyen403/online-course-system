@@ -28,7 +28,7 @@ export const changePassword = async (userId, currentPassword, newPassword) => {
     const { passwordEncoded } = await import('../middlewares/hash_password.middleware.js');
     const user = await User.findById(userId);
     if (!user) throw { status: 404, message: 'User not found' };
-    const valid = passwordCompare(currentPassword, user.password);
+    const valid = await passwordCompare(currentPassword, user.password);
     if (!valid) throw { status: 400, message: 'Current password is incorrect' };
     user.password = await passwordEncoded(newPassword);
     await user.save();

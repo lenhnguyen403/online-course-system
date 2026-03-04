@@ -1,6 +1,12 @@
 import * as paymentService from '../../services/payment.service.js';
 
+function ensureStudentSelf(req, studentId) {
+    if (req.user?.role === 'student' && req.user?.id !== studentId)
+        throw { status: 403, message: 'Forbidden' };
+}
+
 export const getStudentPayments = async (req, res) => {
+    ensureStudentSelf(req, req.params.studentId);
     const result = await paymentService.getStudentPayments(req.params.studentId, req.pagination);
     return res.status(200).json(result);
 };
@@ -22,6 +28,7 @@ export const updatePaymentStatus = async (req, res) => {
 };
 
 export const getNextPayment = async (req, res) => {
+    ensureStudentSelf(req, req.params.studentId);
     const payment = await paymentService.getNextPayment(req.params.studentId);
     return res.status(200).json(payment);
 };

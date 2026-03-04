@@ -1,5 +1,10 @@
 import * as examService from '../../services/exam.service.js';
 
+function ensureStudentSelf(req, studentId) {
+    if (req.user?.role === 'student' && req.user?.id !== studentId)
+        throw { status: 403, message: 'Forbidden' };
+}
+
 export const getExamsByClass = async (req, res) => {
     const exams = await examService.getExamsByClass(req.params.classId);
     return res.status(200).json(exams);
@@ -46,6 +51,7 @@ export const updateExamResult = async (req, res) => {
 };
 
 export const getStudentResults = async (req, res) => {
+    ensureStudentSelf(req, req.params.studentId);
     const result = await examService.getStudentResults(req.params.studentId, req.pagination);
     return res.status(200).json(result);
 };

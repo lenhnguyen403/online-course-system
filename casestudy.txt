@@ -1,0 +1,70 @@
+[Case Study] Ứng dụng quản lý trung tâm
+Mục tiêu
+Xây dựng một ứng dụng quản lý trung tâm đơn giản theo backlog được đưa ra bên dưới đây
+
+ID	Tính năng	Mô tả	Acceptance Criteria	Priority
+1	Là Admin tôi muốn tạo một tài khoản cho giảng viên, học viên và giáo vụ để đăng nhập vào hệ thống		Bao gồm:
+- Email(*)
+- Password(*)
+- Re-pass(*)
+- PhoneNumber(*)
+- FullName(*)
+- DateOfBirth(*)
+- Address(*)
+- Identity(*)
+- Role(*)
+Các trường phải được validate, Mật khẩu giới hạn từ 6-8 kí tự
+Trường role cho phép admin có thể chọn các quyền: giảng viên, học viên hoặc giáo vụ cho tài khoản đó
+Sau khi đăng ký cần hiển thị thông báo và chuyển sang trang 'Đăng nhập'	High
+2	Là Admin tôi muốn có thể tự động gửi email về tài khoản và mật khẩu sau khi tạo xong một tài khoản để người dùng có thể đăng nhập được		Gửi email đến cho email tương ứng về tài khoản và mật khẩu để đăng nhập vào hệ thống	Low
+3	Là người dùng tôi muốn đăng nhập vào hệ thống		Bao gồm:
+- Email(*)
+- Password(*)
+Người dùng có thể sử dụng tài khoản và mật khẩu được tạo bởi admin để đăng nhập vào hệ thống
+Sau khi đăng nhập cần hiển thị thông báo và chuyển hướng sang trang tương ứng với các role: học viên, giảng viên, giáo vụ	High
+4	Là Giảng viên tôi muốn nhìn thấy danh sách lớp học của mình		Hiển thị tất cả danh sách các lớp học hiện có tương ứng với từng giảng viên.	High
+5	Là Giảng viên tôi muốn nhìn thấy danh sách HV trong lớp		Hiển thị danh sách tất cả học viên của lớp học tương ứng trong đó hiển thị tổng số lượng học viên và các thông tin của học viên bao gồm:
+- StudentId
+- FullName
+- Emai
+- PhoneNumber
+- Status
+Status bao gồm: Thôi học, đình chỉ, chờ chuyển lớp, đang học	High
+6	Là giảng viên tôi muốn hiển thị danh sách học viên trong lớp theo các trạng thái		Giảng viên có thể chọn các trạng thái học tập của học viên để hiển thị danh sách học viên tương ứng của lớp đó	Low
+7	Là Giảng viên tôi muốn xem chi tiết 1 HV trong lớp		Giảng viên có thể xem thông tin chi tiết của một học viên trong 1 lớp. Các thông tin có thể xem bao gồm:
+- StudentId
+- Fullname
+- Email
+- DateOfBirth
+- Address
+- PhoneNumber
+- Status	Medium
+8	Là Giảng viên tôi muốn viết nhật ký hằng ngày cho lớp		Giảng viên truy cập vào trang của các lớp để viết nhật ký hàng ngày cho từng lớp.
+Trong đó:
+- Hệ thống sẽ tự động lưu ngày viết nhật ký là ngày hiện tại (dd/mm/yyyy)
+- Hệ thống sẽ tự động lưu tên của giảng viên viết nhật ký
+- Nội dung của nhật ký	High
+9	Là Giảng viên tôi muốn viết nhật ký hằng ngày cho HV trong lớp		Giảng viên truy cập vào trang xem thông tin chi tiết của một học viên để có thể viết nhật ký của học viên đó. Trong đó
+- Hệ thống sẽ tự đông lưu ngày viết nhật ký là ngày hiện tại (dd/mm/yyyy)
+- Hệ thống sẽ tự động lưu tên của giảng viên viết nhật ký
+- Nội dung của nhật ký	Medium
+10	Là Admin tôi muốn hệ thống tự động gửi email đóng học phí cho tất cả học viên khi tới hạn		Hệ thống sẽ kiểm tra thông tin tình trạng học phí của từng bạn học viên và tự động gửi email thông báo đóng hạn học phí trước 3 ngày.	Low
+11	Là học viên tôi muốn có thể xem được tình trạng học phí của mình		Học viên có thể xem được đợt nộp học phí tiếp theo của mình và tình trạng học phí
+Tình trạng học phí bao gồm: nợ học phí hoặc đã đóng	High
+12	Là học viên tôi muốn xem lịch sử học phí		Học viên có thể xem lại lịch sử các đợt nộp học phí của mình	Low
+13	Là học viên tôi muốn có thể xem được điểm các bài kiểm tra		Học viên có thể xem điểm thi tương ứng với từng đợt thi	High
+14	Là Giáo vụ tôi muốn thay đổi điểm cho HV của lớp theo môn học		Giáo vụ có thể cập nhật điểm số cho học viên của từng lớp học	High
+15	Là Giáo vụ tôi muốn tính trung bình điểm thực hành và lý thuyết của lớp		Hệ thống sẽ tự động hiển thị điểm trung bình của một học viên khi Giáo vụ nhập đủ điểm lý thuyết và điểm thực hành	Medium
+16	Là Giáo vụ tôi muốn chuyển trạng thái cho HV		Giáo vụ có thể cập nhật trạng thái của một học viên. Các trạng thái bao gồm: đang học, chờ chuyển lớp, thôi học, đình chỉ	Medium
+17	Là Admin tôi muốn thống kê số lượng HV của từng GV		Admin có thể xem được tổng số lượng học viên mà một giảng viên đang quản lý	Medium
+18	Là Admin tôi muốn nhìn thấy điểm trung bình theo từng lớp		Admin có thể xem được danh sách điểm trung bình của từng lớp	Low
+19	Là Admin thôi muốn nhìn thấy biểu đồ điểm của từng lớp		Admin có thể xem biểu đồ thống kê điểm trung bình của từng bạn học viên trong một lớp	Low
+20	Là Admin tôi muốn hệ tự đồng lưu thông tin dữ liệu của giảng viên hàng tháng		Hệ thống sẽ tự động lưu lại dữ liệu thông tin của giảng viên hàng tháng với các thông tin như sau:
+- Mã gỉang viên
+- Tên giảng viên
+- Số lượng lớp giảng dạy
+- Tổng số lưọng học viên đang dạy	Low
+21	Là Admin tôi muốn thêm môn học cho trung tâm		Admin có thể thêm mới một môn học với các thuộc tính:
+- SubjectId(*)
+- SubjectName(*)
+Các trường phải được validate đầy đủ	High

@@ -1,7 +1,9 @@
 import * as classService from '../../services/class.service.js';
 
 export const getClasses = async (req, res) => {
-    const result = await classService.getClasses(req.pagination);
+    const filter = {};
+    if (req.user?.role === 'teacher') filter.teacherIds = req.user.id;
+    const result = await classService.getClasses(req.pagination, filter);
     return res.status(200).json(result);
 };
 
@@ -11,7 +13,7 @@ export const createClass = async (req, res) => {
 };
 
 export const getClassById = async (req, res) => {
-    const cls = await classService.getClassById(req.params.id);
+    const cls = await classService.getClassById(req.params.id, req.user?.role, req.user?.id);
     return res.status(200).json(cls);
 };
 
@@ -27,6 +29,7 @@ export const deactivateClass = async (req, res) => {
 
 // Students
 export const getClassStudents = async (req, res) => {
+    await classService.getClassById(req.params.classId, req.user?.role, req.user?.id);
     const status = req.query.status;
     const result = await classService.getClassStudents(req.params.classId, req.pagination, status);
     return res.status(200).json(result);
@@ -39,6 +42,7 @@ export const addStudentToClass = async (req, res) => {
 };
 
 export const getClassStudentById = async (req, res) => {
+    await classService.getClassById(req.params.classId, req.user?.role, req.user?.id);
     const enrollment = await classService.getClassStudentById(req.params.classId, req.params.studentId);
     return res.status(200).json(enrollment);
 };

@@ -23,11 +23,11 @@ export const login = async ({ email, password }) => {
     });
 
     if (!user)
-        throw { status: 400, message: 'Invalid credentials. User not found.' };
+        throw { status: 400, message: 'User not found.' };
 
     const isMatch = await passwordCompare(password, user.password);
     if (!isMatch)
-        throw { status: 400, message: 'Invalid credentials. Password does not match.' };
+        throw { status: 400, message: 'Password is not correct.' };
 
     const accessToken = jwt.sign(
         { id: user._id, email: user.email, role: user.role },

@@ -1,41 +1,74 @@
-import React from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import Logo from '../../components/Logo'
-import { FaBars } from "react-icons/fa6";
+import { removeToken } from '../../store/storage'
+import { axiosClient } from '../../utils/axiosClient'
+import ToastMessage from '../../messages/ToastMessage'
+import { FaSearch, FaUserCircle, FaSignOutAlt } from 'react-icons/fa'
+import { useState, useRef, useEffect } from 'react'
+import './Header.css'
 
 const Header = () => {
-    const navigate = useNavigate();
-    const handleTeacherNavigate = () => {
-        navigate('/teacher/login')
-    }
-    return (
-        <header className='shadow-md'>
-            <div className='flex items-center justify-between px-4 md:px-7.5'>
-                <Link className='max-w-[15%] md:max-w-[10%] lg:max-w-[5%]'
-                    to='/'
-                >
-                    <Logo />
-                </Link>
-                <div className='hidden lg:block'>
-                    <button type="button"
-                        className='bg-orange-500 text-white hover:bg-orange-600 
-                            px-4 py-2 mr-4 lg:cursor-pointer rounded'
-                        onClick={handleTeacherNavigate}
-                    >
-                        Giảng viên
-                    </button>
-                    <Link to='/login'
-                        className='hover:text-orange-500 transition-colors'
-                    >
-                        Đăng nhập
-                    </Link>
-                </div>
+  const navigate = useNavigate()
+  const [dropdownOpen, setDropdownOpen] = useState(false)
+  const dropdownRef = useRef(null)
 
-                {/* Icon Bars for Small & Medium Screen */}
-                <FaBars className='lg:hidden text-lg' />
-            </div>
-        </header>
-    )
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) setDropdownOpen(false)
+    }
+    document.addEventListener('click', handleClickOutside)
+    return () => document.removeEventListener('click', handleClickOutside)
+  }, [])
+
+  const logout = async (e) => {
+    e.preventDefault()
+    const refreshToken = localStorage.getItem('refreshToken')
+    try {
+      await axiosClient.post('/auth/logout', refreshToken ? { refreshToken } : {})
+      removeToken()
+      navigate('/')
+      ToastMessage.success('Đăng xuất thành công')
+    } catch (err) {
+      removeToken()
+      navigate('/')
+      ToastMessage.error(err)
+    }
+  }
+
+  return (
+    <header className="sticky top-0 z-10 flex items-center justify-between gap-4 h-14 px-6 border-b border-slate-200 bg-white/90 backdrop-blur shadow-sm">
+      <div className="flex-1 max-w-md">
+        <div className="relative">
+          <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm" />
+          <input
+            type="text"
+            placeholder="Tìm kiếm..."
+            className="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 bg-slate-50 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500/30 focus:border-orange-400"
+          />
+        </div>
+      </div>
+      <div className="relative flex items-center gap-2" ref={dropdownRef}>
+        <button
+          type="button"
+          onClick={() => setDropdownOpen((v) => !v)}
+          className="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-slate-100 text-slate-600 transition-colors"
+        >
+          <FaUserCircle className="text-xl text-slate-500" />
+          <span className="hidden sm:inline text-sm font-medium">Tài khoản</span>
+        </button>
+        {dropdownOpen && (
+          <div className="absolute right-0 top-full mt-1 w-48 py-2 bg-white rounded-xl border border-slate-200 shadow-lg z-50">
+            <Link to="/dashboard" className="block px-4 py-2 text-sm text-slate-600 hover:bg-slate-50" onClick={() => setDropdownOpen(false)}>
+              Tổng quan
+            </Link>
+            <button type="button" onClick={(e) => { setDropdownOpen(false); logout(e); }} className="flex items-center gap-2 w-full px-4 py-2 text-sm text-slate-600 hover:bg-slate-50 text-left">
+              <FaSignOutAlt className="text-slate-400" />
+              Đăng xuất
+            </button>
+          </div>
+        )}
+      </div>
+    </header>
+  )
 }
 
 export default Header
