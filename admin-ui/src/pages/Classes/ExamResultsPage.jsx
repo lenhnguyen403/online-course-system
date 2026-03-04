@@ -72,7 +72,12 @@ export default function ExamResultsPage() {
                 <span>/</span>
                 <span className="text-gray-800">Điểm: {exam.title}</span>
             </div>
-            <h1 className="text-xl font-bold mb-4">Nhập điểm: {exam.title}</h1>
+            <div className="flex items-center gap-3 mb-4">
+                <h1 className="text-xl font-bold">Nhập điểm: {exam.title}</h1>
+                {exam.examType === 'quiz' && (
+                    <Link to={`/dashboard/classes/${classId}/exams/${examId}/questions`} className="px-4 py-2 bg-cyan-500 text-white rounded hover:bg-cyan-600 text-sm">Quản lý câu hỏi quiz</Link>
+                )}
+            </div>
             <div className="mb-4">
                 <button type="button" onClick={handleBulkSave} className="px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600">Lưu tất cả điểm</button>
             </div>

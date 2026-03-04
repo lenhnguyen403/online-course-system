@@ -1,4 +1,6 @@
 import * as profileService from '../../services/profile.service.js';
+import * as myAnnouncementsService from '../../services/myAnnouncements.service.js';
+import * as learningReportService from '../../services/learningReport.service.js';
 
 export const getMe = async (req, res) => {
     const user = await profileService.getProfile(req.user.id);
@@ -34,4 +36,16 @@ export const getMyResults = async (req, res) => {
 export const getMyJournals = async (req, res) => {
     const result = await profileService.getMyJournals(req.user.id, req.user.role, req.pagination);
     return res.status(200).json(result);
+};
+
+export const getMyAnnouncements = async (req, res) => {
+    if (req.user.role !== 'student') return res.status(403).json({ message: 'Only for students' });
+    const result = await myAnnouncementsService.getMyAnnouncements(req.user.id, req.pagination);
+    return res.status(200).json(result);
+};
+
+export const getMyLearningReport = async (req, res) => {
+    if (req.user.role !== 'student') return res.status(403).json({ message: 'Only for students' });
+    const data = await learningReportService.getMyLearningReport(req.user.id);
+    return res.status(200).json(data);
 };

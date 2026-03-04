@@ -38,3 +38,17 @@ export async function sendCredentialsEmail(toEmail, fullName, email, password) {
     console.log('[Email stub] Send credentials to', toEmail, ':', { email, password: '***' });
     return false;
 }
+
+export async function sendResetPasswordEmail(toEmail, fullName, resetLink) {
+    const from = process.env.MAIL_FROM || process.env.SMTP_USER || 'noreply@course.local';
+    const subject = 'Đặt lại mật khẩu - Hệ thống quản lý trung tâm';
+    const text = `Xin chào ${fullName},\n\nBạn đã yêu cầu đặt lại mật khẩu. Truy cập link sau (có hiệu lực 1 giờ):\n${resetLink}\n\nNếu bạn không yêu cầu, hãy bỏ qua email này.`;
+    const html = `<p>Xin chào <b>${fullName}</b>,</p><p>Bạn đã yêu cầu đặt lại mật khẩu. <a href="${resetLink}">Nhấn vào đây để đặt lại mật khẩu</a> (link có hiệu lực 1 giờ).</p><p>Nếu bạn không yêu cầu, hãy bỏ qua email này.</p>`;
+    const transport = await getTransporter();
+    if (transport) {
+        await transport.sendMail({ from, to: toEmail, subject, text, html });
+        return true;
+    }
+    console.log('[Email stub] Send reset password to', toEmail, ':', resetLink);
+    return false;
+}

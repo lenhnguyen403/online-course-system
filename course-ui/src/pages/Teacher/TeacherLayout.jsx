@@ -3,11 +3,13 @@ import { Outlet, useNavigate, NavLink } from 'react-router-dom'
 import { removeToken } from '../../store/storage'
 import ToastMessage from '../../messages/ToastMessage'
 import { axiosClient } from '../../utils/axiosClient'
-import { FaTachometerAlt, FaBookOpen, FaUser, FaSignOutAlt } from 'react-icons/fa'
+import { FaTachometerAlt, FaBookOpen, FaTasks, FaCalendarAlt, FaUser, FaSignOutAlt } from 'react-icons/fa'
 
 const nav = [
   { to: '/teacher', end: true, label: 'Tổng quan', icon: FaTachometerAlt },
   { to: '/teacher/classes', end: false, label: 'Lớp của tôi', icon: FaBookOpen },
+  { to: '/teacher/pending-submissions', end: false, label: 'Bài nộp chờ chấm', icon: FaTasks },
+  { to: '/teacher/calendar', end: false, label: 'Lịch', icon: FaCalendarAlt },
   { to: '/teacher/profile', end: false, label: 'Cá nhân', icon: FaUser },
 ]
 

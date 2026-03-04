@@ -4,7 +4,8 @@ import ToastMessage from '../../messages/ToastMessage'
 import PageHeader from '../../components/ui/PageHeader'
 import EmptyState from '../../components/ui/EmptyState'
 import LoadingSpinner from '../../components/ui/LoadingSpinner'
-import { FaChartBar } from 'react-icons/fa'
+import { FaChartBar, FaEdit } from 'react-icons/fa'
+import { Link } from 'react-router-dom'
 
 function ScoreCell({ value }) {
   if (value == null || value === '') return <span className="text-slate-400">—</span>
@@ -20,16 +21,23 @@ function ScoreCell({ value }) {
 export default function StudentExams() {
   const [user, setUser] = useState(null)
   const [list, setList] = useState([])
+  const [quizExams, setQuizExams] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const u = JSON.parse(localStorage.getItem('user') || '{}')
     if (!u.id) { setLoading(false); return }
     setUser(u)
-    axiosClient.get(`/exams/students/${u.id}/results`, { params: { limit: 50 } })
-      .then((res) => setList(res.data.data || []))
-      .catch(ToastMessage.error)
-      .finally(() => setLoading(false))
+    Promise.all([
+      axiosClient.get(`/exams/students/${u.id}/results`, { params: { limit: 50 } }).then((res) => setList(res.data.data || [])).catch(ToastMessage.error),
+      axiosClient.get('/me/classes', { params: { limit: 50 } })
+        .then((res) => {
+          const classes = res.data.data || []
+          return Promise.all(classes.map((c) => axiosClient.get(`/exams/classes/${c._id}/exams`).then((r) => (Array.isArray(r.data) ? r.data : []).map((e) => ({ ...e, className: c.className }))).catch(() => [])))
+        })
+        .then((arr) => setQuizExams(arr.flat().filter((e) => e.examType === 'quiz')))
+        .catch(() => {}),
+    ]).finally(() => setLoading(false))
   }, [])
 
   if (loading) return <LoadingSpinner />
@@ -37,6 +45,23 @@ export default function StudentExams() {
   return (
     <div className="space-y-8">
       <PageHeader breadcrumbs={[{ to: '/student', label: 'Trang chủ' }, { label: 'Điểm thi' }]} title="Điểm các bài kiểm tra" description="Xem điểm lý thuyết, thực hành và trung bình theo từng đợt thi." />
+
+      {quizExams.length > 0 && (
+        <div className="card card-body">
+          <h3 className="font-bold text-slate-800 mb-3">Quiz trực tuyến</h3>
+          <ul className="space-y-2">
+            {quizExams.map((e) => (
+              <li key={e._id} className="flex items-center justify-between py-2 border-b border-slate-100 last:border-0">
+                <span className="font-medium text-slate-800">{e.title}</span>
+                <span className="text-sm text-slate-500">{e.className}</span>
+                <Link to={`/student/exams/${e._id}/quiz`} className="btn-primary text-sm inline-flex items-center gap-1">
+                  <FaEdit className="text-xs" /> Làm bài
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {list.length === 0 ? (
         <div className="card">

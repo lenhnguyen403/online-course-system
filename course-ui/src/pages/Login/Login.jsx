@@ -89,7 +89,7 @@ const Login = () => {
                             </div>
                             <div className="flex items-center justify-between text-sm">
                                 <label className="inline-flex items-center gap-2 text-slate-600 cursor-pointer"><input type="checkbox" className="rounded border-slate-300 text-orange-500 focus:ring-orange-500" /> Ghi nhớ</label>
-                                <Link to="/" className={`font-medium ${isTeacher ? 'text-rose-600 hover:text-rose-700' : 'text-cyan-600 hover:text-cyan-700'}`}>Quên mật khẩu?</Link>
+                                <Link to="/forgot-password" className={`font-medium ${isTeacher ? 'text-rose-600 hover:text-rose-700' : 'text-cyan-600 hover:text-cyan-700'}`}>Quên mật khẩu?</Link>
                             </div>
                             <button type="submit" disabled={!isFormValid} className={`w-full py-3 rounded-xl font-semibold transition-all flex items-center justify-center ${!isFormValid ? 'bg-slate-200 text-slate-400 cursor-not-allowed' : isTeacher ? 'bg-rose-500 hover:bg-rose-600 text-white shadow-lg shadow-rose-500/25' : 'bg-cyan-500 hover:bg-cyan-600 text-white shadow-lg shadow-cyan-500/25'}`}>
                                 Đăng nhập

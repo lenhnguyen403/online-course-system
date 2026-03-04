@@ -49,6 +49,18 @@ export default function StudentClasses() {
                   <FaChalkboardTeacher className="text-slate-400" /> {c.teacherName}
                 </p>
               )}
+              <div className="mt-4 flex flex-wrap gap-3">
+                {c._id && (
+                  <Link to={`/student/classes/${c._id}/chat`} className="inline-flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-slate-800">
+                    Chat
+                  </Link>
+                )}
+                {c.courseId?._id && (
+                  <Link to={`/student/courses/${c.courseId._id}`} className="inline-flex items-center gap-2 text-sm font-medium text-cyan-600 hover:text-cyan-700">
+                    Học nội dung khóa →
+                  </Link>
+                )}
+              </div>
             </div>
           ))}
         </div>

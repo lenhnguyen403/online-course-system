@@ -11,10 +11,12 @@ import SubjectList from './pages/Subjects/SubjectList'
 import CourseList from './pages/Courses/CourseList'
 import CreateCourse from './pages/Courses/CreateCourse'
 import CourseDetail from './pages/Courses/CourseDetail'
+import CourseContent from './pages/Courses/CourseContent'
 import ClassList from './pages/Classes/ClassList'
 import CreateClass from './pages/Classes/CreateClass'
 import ClassDetail from './pages/Classes/ClassDetail'
 import ExamResultsPage from './pages/Classes/ExamResultsPage'
+import ExamQuestionsPage from './pages/Classes/ExamQuestionsPage'
 import PaymentList from './pages/Payments/PaymentList'
 import CreatePayment from './pages/Payments/CreatePayment'
 import JournalList from './pages/Journals/JournalList'
@@ -33,10 +35,12 @@ function App() {
         <Route path="courses" element={<CourseList />} />
         <Route path="courses/create" element={<CreateCourse />} />
         <Route path="courses/:id" element={<CourseDetail />} />
+        <Route path="courses/:id/content" element={<CourseContent />} />
         <Route path="classes" element={<ClassList />} />
         <Route path="classes/create" element={<CreateClass />} />
         <Route path="classes/:id" element={<ClassDetail />} />
         <Route path="classes/:classId/exams/:examId/results" element={<ExamResultsPage />} />
+        <Route path="classes/:classId/exams/:examId/questions" element={<ExamQuestionsPage />} />
         <Route path="payments" element={<PaymentList />} />
         <Route path="payments/create" element={<CreatePayment />} />
         <Route path="journals" element={<JournalList />} />

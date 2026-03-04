@@ -18,6 +18,27 @@ import {
     addTeacherToClass,
     removeTeacherFromClass,
 } from '../controllers/class/class.controller.js';
+import {
+    getAssignmentsByClass,
+    getAssignmentById,
+    createAssignment,
+    updateAssignment,
+    deleteAssignment,
+    getSubmissionsByAssignment,
+    getSubmissionById,
+    createSubmission,
+    updateSubmissionGrade,
+    uploadSubmissionFile,
+} from '../controllers/assignment/assignment.controller.js';
+import upload from '../middlewares/multer.middleware.js';
+import {
+    getAnnouncementsByClass,
+    getAnnouncementById,
+    createAnnouncement,
+    updateAnnouncement,
+    deleteAnnouncement,
+} from '../controllers/announcement/announcement.controller.js';
+import { getMessagesByClass, createMessage } from '../controllers/message/message.controller.js';
 
 const classRouter = express.Router();
 
@@ -47,5 +68,28 @@ classRouter.delete('/:classId/students/:studentId', authMiddleware(...adminStaff
 classRouter.get('/:classId/teachers', authMiddleware(...adminStaffTeacher), getClassTeachers);
 classRouter.post('/:classId/teachers', authMiddleware(...adminStaff), addTeacherToClass);
 classRouter.delete('/:classId/teachers/:teacherId', authMiddleware(...adminStaff), removeTeacherFromClass);
+
+// Assignments
+classRouter.get('/:classId/assignments', authMiddleware(...adminStaffTeacher, 'student'), getAssignmentsByClass);
+classRouter.post('/:classId/assignments', authMiddleware(...adminStaffTeacher), createAssignment);
+classRouter.post('/:classId/assignments/upload', authMiddleware('student'), upload.single('file'), uploadSubmissionFile);
+classRouter.get('/:classId/assignments/:assignmentId', authMiddleware(...adminStaffTeacher, 'student'), getAssignmentById);
+classRouter.put('/:classId/assignments/:assignmentId', authMiddleware(...adminStaffTeacher), updateAssignment);
+classRouter.patch('/:classId/assignments/:assignmentId/deactivate', authMiddleware(...adminStaffTeacher), deleteAssignment);
+classRouter.get('/:classId/assignments/:assignmentId/submissions', authMiddleware(...adminStaffTeacher), paginationMiddleware, getSubmissionsByAssignment);
+classRouter.get('/:classId/assignments/:assignmentId/submissions/:submissionId', authMiddleware(...adminStaffTeacher, 'student'), getSubmissionById);
+classRouter.post('/:classId/assignments/:assignmentId/submit', authMiddleware('student'), createSubmission);
+classRouter.put('/:classId/assignments/:assignmentId/submissions/:submissionId/grade', authMiddleware(...adminStaffTeacher), updateSubmissionGrade);
+
+// Announcements
+classRouter.get('/:classId/announcements', authMiddleware(...adminStaffTeacher, 'student'), getAnnouncementsByClass);
+classRouter.post('/:classId/announcements', authMiddleware(...adminStaffTeacher), createAnnouncement);
+classRouter.get('/:classId/announcements/:announcementId', authMiddleware(...adminStaffTeacher, 'student'), getAnnouncementById);
+classRouter.put('/:classId/announcements/:announcementId', authMiddleware(...adminStaffTeacher), updateAnnouncement);
+classRouter.patch('/:classId/announcements/:announcementId/deactivate', authMiddleware(...adminStaffTeacher), deleteAnnouncement);
+
+// Chat (GV - HV trong lớp)
+classRouter.get('/:classId/messages', authMiddleware(...adminStaffTeacher, 'student'), getMessagesByClass);
+classRouter.post('/:classId/messages', authMiddleware(...adminStaffTeacher, 'student'), createMessage);
 
 export default classRouter;

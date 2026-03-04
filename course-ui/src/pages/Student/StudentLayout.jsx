@@ -3,7 +3,7 @@ import { Outlet, useNavigate, NavLink } from 'react-router-dom'
 import { removeToken } from '../../store/storage'
 import ToastMessage from '../../messages/ToastMessage'
 import { axiosClient } from '../../utils/axiosClient'
-import { FaUserGraduate, FaHome, FaBook, FaMoneyBillWave, FaChartBar, FaUser, FaSignOutAlt } from 'react-icons/fa'
+import { FaUserGraduate, FaHome, FaBook, FaTasks, FaMoneyBillWave, FaChartBar, FaCalendarAlt, FaBullhorn, FaBell, FaUser, FaSignOutAlt, FaCertificate, FaChartLine, FaGraduationCap } from 'react-icons/fa'
 
 const StudentLayout = () => {
   const navigate = useNavigate()
@@ -28,8 +28,15 @@ const StudentLayout = () => {
   const nav = [
     { to: '/student', end: true, label: 'Trang chủ', icon: FaHome },
     { to: '/student/classes', end: false, label: 'Lớp của tôi', icon: FaBook },
+    { to: '/student/my-courses', end: false, label: 'Khóa học của tôi', icon: FaGraduationCap },
+    { to: '/student/assignments', end: false, label: 'Bài tập', icon: FaTasks },
     { to: '/student/payments', end: false, label: 'Lịch sử học phí', icon: FaMoneyBillWave },
     { to: '/student/exams', end: false, label: 'Điểm thi', icon: FaChartBar },
+    { to: '/student/calendar', end: false, label: 'Lịch', icon: FaCalendarAlt },
+    { to: '/student/announcements', end: false, label: 'Thông báo lớp', icon: FaBullhorn },
+    { to: '/student/notifications', end: false, label: 'Thông báo', icon: FaBell },
+    { to: '/student/certificates', end: false, label: 'Chứng nhận', icon: FaCertificate },
+    { to: '/student/learning-report', end: false, label: 'Báo cáo học tập', icon: FaChartLine },
     { to: '/student/profile', end: false, label: 'Cá nhân', icon: FaUser },
   ]
 

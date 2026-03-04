@@ -5,9 +5,11 @@ import { paginationMiddleware } from '../middlewares/pagination.middleware.js';
 import {
     getAdminDashboard,
     getTeacherDashboard,
+    getTeacherPendingSubmissions,
     getStudentDashboard,
     getClassDashboard,
     getClassScoreChart,
+    getClassLearningReport,
     generateTeacherSnapshot,
     getAuditLogs,
 } from '../controllers/dashboard/dashboard.controller.js';
@@ -19,9 +21,11 @@ dashboardRouter.use(verifyToken);
 dashboardRouter.get('/audit-logs', authMiddleware('admin', 'staff'), paginationMiddleware, getAuditLogs);
 dashboardRouter.get('/admin', authMiddleware('admin', 'staff'), getAdminDashboard);
 dashboardRouter.get('/teacher', authMiddleware('admin', 'staff', 'teacher'), getTeacherDashboard);
+dashboardRouter.get('/teacher/pending-submissions', authMiddleware('admin', 'staff', 'teacher'), getTeacherPendingSubmissions);
 dashboardRouter.get('/student', authMiddleware('admin', 'staff', 'student'), getStudentDashboard);
 dashboardRouter.get('/class', authMiddleware('admin', 'staff'), getClassDashboard);
 dashboardRouter.get('/class/:classId/score-chart', authMiddleware('admin', 'staff'), getClassScoreChart);
+dashboardRouter.get('/class/:classId/learning-report', authMiddleware('admin', 'staff', 'teacher'), getClassLearningReport);
 dashboardRouter.post('/teacher-snapshot', authMiddleware('admin'), generateTeacherSnapshot);
 
 export default dashboardRouter;

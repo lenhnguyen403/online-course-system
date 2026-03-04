@@ -1,17 +1,15 @@
 import { passwordCompare } from '../middlewares/hash_password.middleware.js';
 import User from '../models/user.model.js';
 import { RefreshToken } from '../models/refreshToken.model.js';
+import ResetToken from '../models/resetToken.model.js';
 import jwt from 'jsonwebtoken';
+import { sendResetPasswordEmail } from './email.service.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || '';
 const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || '';
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '1h';
 const JWT_REFRESH_EXPIRES_IN = process.env.JWT_REFRESH_EXPIRES_IN || '7d';
-
-// console.log('SECRET:', process.env.JWT_SECRET);
-
-// In-memory store for reset tokens (use Redis in production)
-const resetTokens = new Map();
+const RESET_PASSWORD_URL = process.env.RESET_PASSWORD_URL || process.env.FRONTEND_URL || 'http://localhost:5173';
 
 export const login = async ({ email, password }) => {
     const user = await User.findOne({
@@ -101,28 +99,31 @@ export const forgotPassword = async (email) => {
         JWT_SECRET,
         { expiresIn: '1h' }
     );
-    resetTokens.set(resetToken, { userId: user._id.toString(), exp: Date.now() + 3600000 });
+    const expiresAt = new Date(Date.now() + 3600000);
+    await ResetToken.create({ userId: user._id, token: resetToken, expiresAt });
 
-    // TODO: Send email with reset link (e.g. /reset-password?token=...)
+    const resetLink = `${RESET_PASSWORD_URL.replace(/\/$/, '')}/reset-password?token=${encodeURIComponent(resetToken)}`;
+    await sendResetPasswordEmail(user.email, user.fullName, resetLink);
+
     return { message: 'If the email exists, a reset link has been sent' };
 };
 
 export const resetPassword = async (token, newPassword) => {
-    const stored = resetTokens.get(token);
-    if (!stored || Date.now() > stored.exp)
+    const stored = await ResetToken.findOne({ token });
+    if (!stored || new Date() > stored.expiresAt)
         throw { status: 400, message: 'Invalid or expired reset token' };
 
     let decoded;
     try {
         decoded = jwt.verify(token, JWT_SECRET);
     } catch {
-        resetTokens.delete(token);
+        await ResetToken.deleteOne({ token });
         throw { status: 400, message: 'Invalid or expired reset token' };
     }
 
     const { passwordEncoded } = await import('../middlewares/hash_password.middleware.js');
     const hashed = await passwordEncoded(newPassword);
     await User.updateOne({ _id: decoded.id }, { password: hashed });
-    resetTokens.delete(token);
+    await ResetToken.deleteOne({ token });
     return { message: 'Password reset successfully' };
 };

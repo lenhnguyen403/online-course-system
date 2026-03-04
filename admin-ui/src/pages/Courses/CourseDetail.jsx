@@ -61,6 +61,7 @@ export default function CourseDetail() {
                         </dl>
                         <div className="mt-6 flex gap-2">
                             <button type="button" onClick={() => setEditing(true)} className="px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600">Chỉnh sửa</button>
+                            <Link to={`/dashboard/courses/${id}/content`} className="px-4 py-2 bg-cyan-500 text-white rounded hover:bg-cyan-600">Nội dung khóa học</Link>
                             <Link to="/dashboard/courses" className="px-4 py-2 border rounded hover:bg-gray-50">Quay lại</Link>
                         </div>
                     </>

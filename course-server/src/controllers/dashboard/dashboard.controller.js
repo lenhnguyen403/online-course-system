@@ -1,4 +1,5 @@
 import * as dashboardService from '../../services/dashboard.service.js';
+import * as learningReportService from '../../services/learningReport.service.js';
 
 export const getAdminDashboard = async (req, res) => {
     const data = await dashboardService.getAdminDashboard();
@@ -7,6 +8,12 @@ export const getAdminDashboard = async (req, res) => {
 
 export const getTeacherDashboard = async (req, res) => {
     const data = await dashboardService.getTeacherDashboard(req.user.id);
+    return res.status(200).json(data);
+};
+
+export const getTeacherPendingSubmissions = async (req, res) => {
+    const limit = Math.min(Number(req.query.limit) || 50, 100);
+    const data = await dashboardService.getTeacherPendingSubmissions(req.user.id, limit);
     return res.status(200).json(data);
 };
 
@@ -32,5 +39,14 @@ export const generateTeacherSnapshot = async (req, res) => {
 
 export const getAuditLogs = async (req, res) => {
     const data = await dashboardService.getAuditLogs(req.pagination);
+    return res.status(200).json(data);
+};
+
+export const getClassLearningReport = async (req, res) => {
+    const data = await learningReportService.getClassLearningReport(
+        req.params.classId,
+        req.user.role,
+        req.user.id
+    );
     return res.status(200).json(data);
 };

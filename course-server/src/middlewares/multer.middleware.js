@@ -26,6 +26,10 @@ const storage = multer.diskStorage({
             folder = 'uploads/classes';
         }
 
+        if (req.baseUrl.includes('assignments')) {
+            folder = 'uploads/submissions';
+        }
+
         ensureDir(folder);
         cb(null, folder);
     },
@@ -52,4 +56,6 @@ const upload = multer({
     storage,
     fileFilter,
     limits: { fileSize: 5 * 1024 * 1024 } // 5MB
-})
+});
+
+export default upload;
