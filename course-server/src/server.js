@@ -15,7 +15,7 @@ import { errorMiddleware } from './middlewares/error.middleware.js'
 
 
 const app = express();
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 3003;
 
 cf.connectDB()
 cf.connectCloudinary()
