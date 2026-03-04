@@ -1,5 +1,4 @@
 import express from 'express';
-import chalk from 'chalk';
 import authRouter from './auth.route.js';
 import profileRouter from './profile.route.js';
 import userRouter from './user.route.js';
@@ -12,23 +11,18 @@ import paymentRouter from './payment.route.js';
 import reportRouter from './report.route.js';
 import dashboardRouter from './dashboard.route.js';
 
-const API_PREFIX = process.env.API_PREFIX || '/api/v1';
-
 const router = (app) => {
-    app.use(`${API_PREFIX}/auth`, authRouter);
-    app.use(`${API_PREFIX}/me`, profileRouter);
-    app.use(`${API_PREFIX}/users`, userRouter);
-    app.use(`${API_PREFIX}/subjects`, subjectRouter);
-    app.use(`${API_PREFIX}/courses`, courseRouter);
-    app.use(`${API_PREFIX}/classes`, classRouter);
-    app.use(`${API_PREFIX}/journals`, journalRouter);
-    app.use(`${API_PREFIX}/exams`, examRouter);
-    app.use(`${API_PREFIX}/payments`, paymentRouter);
-    app.use(`${API_PREFIX}/reports`, reportRouter);
-    app.use(`${API_PREFIX}/dashboard`, dashboardRouter);
-
-    console.log(chalk.magentaBright.bold(`App is running on API prefix: ${API_PREFIX}`));
-
+    app.use(`/auth`, authRouter);
+    app.use(`/me`, profileRouter);
+    app.use(`/users`, userRouter);
+    app.use(`/subjects`, subjectRouter);
+    app.use(`/courses`, courseRouter);
+    app.use(`/classes`, classRouter);
+    app.use(`/journals`, journalRouter);
+    app.use(`/exams`, examRouter);
+    app.use(`/payments`, paymentRouter);
+    app.use(`/reports`, reportRouter);
+    app.use(`/dashboard`, dashboardRouter);
 }
 
 export default router;
