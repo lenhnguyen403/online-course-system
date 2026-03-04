@@ -2,7 +2,7 @@ import mongoose from 'mongoose'
 
 const connectDB = async () => {
     try {
-        await mongoose.connect(process.env.MONGO_URI)
+        await mongoose.connect(`${process.env.MONGO_URI}/f5-edu-db`)
         console.log('Connect DB successfully!!!');
 
     } catch (error) {
