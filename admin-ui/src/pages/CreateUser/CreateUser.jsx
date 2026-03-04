@@ -58,8 +58,7 @@ const CreateUser = () => {
                 ...formData,
                 dateOfBirth: new Date(formData.dateOfBirth).toISOString(),
             })
-            ToastMessage.success('Tạo tài khoản thành công. Chuyển sang trang Đăng nhập.')
-            navigate('/')
+            ToastMessage.success('Tạo tài khoản thành công.')
         } catch (err) {
             ToastMessage.error(err)
         } finally {
