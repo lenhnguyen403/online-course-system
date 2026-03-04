@@ -23,8 +23,8 @@ cf.connectCloudinary()
 const allowedOrigins = [
     'http://localhost:5173',
     'http://localhost:5174',
-    'https://f5-edu-admin.vercel.app/',
-    'https://f5-edu.vercel.app/'
+    'https://f5-edu-admin.vercel.app',
+    'https://f5-edu.vercel.app'
 
 ]
 
