@@ -37,8 +37,14 @@ app.get('/', (req, res) => {
 app.use(notFoundMiddleware);
 app.use(errorMiddleware);
 
-app.listen(port, () => {
-    console.log("=============================================");
-    console.log('Server is running on ' + chalk.blueBright.bold.underline(`http://localhost:${port}`));
-    console.log("=============================================");
-});
+// Vercel serverless: export app, không gọi listen (Vercel gọi handler theo request)
+// Chạy local: gọi listen như bình thường
+if (process.env.VERCEL !== '1') {
+    app.listen(port, () => {
+        console.log("=============================================");
+        console.log('Server is running on ' + chalk.blueBright.bold.underline(`http://localhost:${port}`));
+        console.log("=============================================");
+    });
+}
+
+export default app;
