@@ -5,6 +5,7 @@ import PageHeader from '../../components/ui/PageHeader'
 import Badge from '../../components/ui/Badge'
 import EmptyState from '../../components/ui/EmptyState'
 import LoadingSpinner from '../../components/ui/LoadingSpinner'
+import Pagination from '../../components/ui/Pagination'
 import { FaMoneyBillWave } from 'react-icons/fa'
 
 const PAYMENT_STATUS_LABEL = { paid: 'Đã đóng', unpaid: 'Nợ học phí', overdue: 'Quá hạn', pending: 'Chờ thanh toán' }
@@ -13,20 +14,28 @@ const PAYMENT_BADGE = { paid: 'success', unpaid: 'danger', overdue: 'danger', pe
 export default function StudentPayments() {
     const [user, setUser] = useState(null)
     const [list, setList] = useState([])
+    const [total, setTotal] = useState(0)
+    const [page, setPage] = useState(1)
+    const [pageSize, setPageSize] = useState(10)
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         const u = JSON.parse(localStorage.getItem('user') || '{}')
-        if (!u.id) {
-            setLoading(false)
-            return
-        }
-        setUser(u)
-        axiosClient.get(`/payments/students/${u.id}/payments`, { params: { limit: 50 } })
-            .then((res) => setList(res.data.data || []))
+        if (u.id) setUser(u)
+        else setLoading(false)
+    }, [])
+
+    useEffect(() => {
+        if (!user?.id) return
+        setLoading(true)
+        axiosClient.get(`/payments/students/${user.id}/payments`, { params: { page: page - 1, size: pageSize } })
+            .then((res) => {
+                setList(res.data.data || [])
+                setTotal(res.data.total ?? 0)
+            })
             .catch(ToastMessage.error)
             .finally(() => setLoading(false))
-    }, [])
+    }, [user?.id, page, pageSize])
 
     if (loading) return <LoadingSpinner />
 
@@ -63,6 +72,13 @@ export default function StudentPayments() {
                             </tbody>
                         </table>
                     </div>
+                    <Pagination
+                        page={page}
+                        total={total}
+                        pageSize={pageSize}
+                        onPageChange={setPage}
+                        onPageSizeChange={(s) => { setPageSize(s); setPage(1) }}
+                    />
                 </div>
             )}
         </div>

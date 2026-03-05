@@ -5,29 +5,32 @@ import ToastMessage from '../../messages/ToastMessage'
 import PageHeader from '../../components/ui/PageHeader'
 import LoadingSpinner from '../../components/ui/LoadingSpinner'
 import EmptyState from '../../components/ui/EmptyState'
-import { FaTasks, FaClipboardCheck } from 'react-icons/fa'
+import Pagination from '../../components/ui/Pagination'
+import { FaClipboardCheck } from 'react-icons/fa'
 
 export default function TeacherPendingSubmissions() {
-  const [data, setData] = useState({ data: [], total: 0 })
+  const [list, setList] = useState([])
+  const [total, setTotal] = useState(0)
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(20)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    axiosClient.get('/dashboard/teacher/pending-submissions', { params: { limit: 100 } })
-      .then((res) => setData({ data: res.data.data || [], total: res.data.total ?? 0 }))
-      .catch(() => setData({ data: [], total: 0 }))
+    setLoading(true)
+    axiosClient.get('/dashboard/teacher/pending-submissions', { params: { page: page - 1, size: pageSize } })
+      .then((res) => { setList(res.data.data || []); setTotal(res.data.total ?? 0) })
+      .catch(() => { setList([]); setTotal(0) })
       .finally(() => setLoading(false))
-  }, [])
+  }, [page, pageSize])
 
-  if (loading) return <LoadingSpinner />
-
-  const list = data.data || []
+  if (loading && list.length === 0) return <LoadingSpinner />
 
   return (
     <div className="space-y-6">
       <PageHeader
         breadcrumbs={[{ to: '/teacher', label: 'Tổng quan' }, { label: 'Bài nộp chờ chấm' }]}
         title="Bài nộp chờ chấm"
-        description={`Tổng ${data.total} bài nộp chưa chấm điểm. Nhấn "Chấm bài" để vào trang chấm.`}
+        description={`Tổng ${total} bài nộp chưa chấm điểm. Nhấn "Chấm bài" để vào trang chấm.`}
       />
 
       {list.length === 0 ? (
@@ -71,6 +74,7 @@ export default function TeacherPendingSubmissions() {
               </tbody>
             </table>
           </div>
+          <Pagination page={page} total={total} pageSize={pageSize} onPageChange={setPage} onPageSizeChange={(s) => { setPageSize(s); setPage(1) }} />
         </div>
       )}
     </div>

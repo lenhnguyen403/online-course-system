@@ -4,14 +4,22 @@ import { axiosClient } from '../../utils/axiosClient'
 import ToastMessage from '../../messages/ToastMessage'
 import PageHeader from '../../components/ui/PageHeader'
 import LoadingSpinner from '../../components/ui/LoadingSpinner'
+import Pagination from '../../components/ui/Pagination'
 
 export default function ClassList() {
   const [list, setList] = useState([])
+  const [total, setTotal] = useState(0)
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    axiosClient.get('/classes', { params: { limit: 50 } }).then((res) => setList(res.data.data || [])).catch(ToastMessage.error).finally(() => setLoading(false))
-  }, [])
+    setLoading(true)
+    axiosClient.get('/classes', { params: { page: page - 1, size: pageSize } })
+      .then((res) => { setList(res.data.data || []); setTotal(res.data.total ?? 0) })
+      .catch(ToastMessage.error)
+      .finally(() => setLoading(false))
+  }, [page, pageSize])
 
   if (loading) return <LoadingSpinner />
 
@@ -48,6 +56,7 @@ export default function ClassList() {
             </tbody>
           </table>
         </div>
+        <Pagination page={page} total={total} pageSize={pageSize} onPageChange={setPage} onPageSizeChange={(s) => { setPageSize(s); setPage(1) }} />
       </div>
     </div>
   )

@@ -1,5 +1,5 @@
 /**
- * Email service - gửi thông tin đăng nhập cho user.
+ * Email service.
  * Cấu hình SMTP qua env: SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, MAIL_FROM
  * Nếu không cấu hình thì chỉ log ra console (development).
  */
@@ -50,5 +50,24 @@ export async function sendResetPasswordEmail(toEmail, fullName, resetLink) {
         return true;
     }
     console.log('[Email stub] Send reset password to', toEmail, ':', resetLink);
+    return false;
+}
+
+export async function sendPaymentReminderEmail(toEmail, fullName, className, dueDate, amount) {
+    const from = process.env.MAIL_FROM || process.env.SMTP_USER || 'noreply@course.local';
+    const subject = 'Nhắc đóng học phí - Hệ thống quản lý trung tâm';
+    const dueText = dueDate ? new Date(dueDate).toLocaleDateString('vi-VN') : 'sắp tới';
+    const amountText = typeof amount === 'number' ? `${amount.toLocaleString('vi-VN')} VNĐ` : 'theo thông báo';
+    const text = `Xin chào ${fullName},\n\nĐây là email nhắc đóng học phí cho lớp ${className || ''}.\n\nHạn nộp: ${dueText}\nSố tiền: ${amountText}\n\nNếu bạn đã đóng, vui lòng bỏ qua email này.`;
+    const html = `<p>Xin chào <b>${fullName}</b>,</p>
+<p>Đây là email nhắc đóng học phí cho lớp <b>${className || ''}</b>.</p>
+<p><b>Hạn nộp:</b> ${dueText}<br/><b>Số tiền:</b> ${amountText}</p>
+<p>Nếu bạn đã đóng, vui lòng bỏ qua email này.</p>`;
+    const transport = await getTransporter();
+    if (transport) {
+        await transport.sendMail({ from, to: toEmail, subject, text, html });
+        return true;
+    }
+    console.log('[Email stub] Send payment reminder to', toEmail, ':', { className, dueDate, amount });
     return false;
 }

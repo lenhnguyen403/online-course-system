@@ -3,10 +3,14 @@ import { Outlet, useNavigate, NavLink } from 'react-router-dom'
 import { removeToken } from '../../store/storage'
 import ToastMessage from '../../messages/ToastMessage'
 import { axiosClient } from '../../utils/axiosClient'
+import { useTheme } from '../../contexts/ThemeContext'
+import { useI18n } from '../../contexts/I18nContext'
 import { FaUserGraduate, FaHome, FaBook, FaTasks, FaMoneyBillWave, FaChartBar, FaCalendarAlt, FaBullhorn, FaBell, FaUser, FaSignOutAlt, FaCertificate, FaChartLine, FaGraduationCap } from 'react-icons/fa'
 
 const StudentLayout = () => {
   const navigate = useNavigate()
+  const { theme, toggleTheme } = useTheme()
+  const { t, lang, setLang } = useI18n()
 
   const logout = async (e) => {
     e.preventDefault()
@@ -26,18 +30,18 @@ const StudentLayout = () => {
   }
 
   const nav = [
-    { to: '/student', end: true, label: 'Trang chủ', icon: FaHome },
-    { to: '/student/classes', end: false, label: 'Lớp của tôi', icon: FaBook },
-    { to: '/student/my-courses', end: false, label: 'Khóa học của tôi', icon: FaGraduationCap },
-    { to: '/student/assignments', end: false, label: 'Bài tập', icon: FaTasks },
-    { to: '/student/payments', end: false, label: 'Lịch sử học phí', icon: FaMoneyBillWave },
-    { to: '/student/exams', end: false, label: 'Điểm thi', icon: FaChartBar },
-    { to: '/student/calendar', end: false, label: 'Lịch', icon: FaCalendarAlt },
-    { to: '/student/announcements', end: false, label: 'Thông báo lớp', icon: FaBullhorn },
-    { to: '/student/notifications', end: false, label: 'Thông báo', icon: FaBell },
-    { to: '/student/certificates', end: false, label: 'Chứng nhận', icon: FaCertificate },
-    { to: '/student/learning-report', end: false, label: 'Báo cáo học tập', icon: FaChartLine },
-    { to: '/student/profile', end: false, label: 'Cá nhân', icon: FaUser },
+    { to: '/student', end: true, labelKey: 'student.nav.home', icon: FaHome },
+    { to: '/student/classes', end: false, labelKey: 'student.nav.classes', icon: FaBook },
+    { to: '/student/my-courses', end: false, labelKey: 'student.nav.myCourses', icon: FaGraduationCap },
+    { to: '/student/assignments', end: false, labelKey: 'student.nav.assignments', icon: FaTasks },
+    { to: '/student/payments', end: false, labelKey: 'student.nav.payments', icon: FaMoneyBillWave },
+    { to: '/student/exams', end: false, labelKey: 'student.nav.exams', icon: FaChartBar },
+    { to: '/student/calendar', end: false, labelKey: 'student.nav.calendar', icon: FaCalendarAlt },
+    { to: '/student/announcements', end: false, labelKey: 'student.nav.announcements', icon: FaBullhorn },
+    { to: '/student/notifications', end: false, labelKey: 'student.nav.notifications', icon: FaBell },
+    { to: '/student/certificates', end: false, labelKey: 'student.nav.certificates', icon: FaCertificate },
+    { to: '/student/learning-report', end: false, labelKey: 'student.nav.learningReport', icon: FaChartLine },
+    { to: '/student/profile', end: false, labelKey: 'student.nav.profile', icon: FaUser },
   ]
 
   return (
@@ -49,13 +53,29 @@ const StudentLayout = () => {
               <FaUserGraduate className="text-lg" />
             </div>
             <div>
-              <div className="font-bold text-slate-800">Học viên</div>
+              <div className="font-bold text-slate-800">{t('student.sidebar.title')}</div>
               <div className="text-xs text-slate-500">LMS Portal</div>
+              <div className="mt-1 flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setLang(lang === 'vi' ? 'en' : 'vi')}
+                  className="px-2 py-0.5 rounded-lg border border-slate-200 text-[11px] font-medium text-slate-600 hover:bg-slate-100"
+                >
+                  {lang === 'vi' ? 'EN' : 'VI'}
+                </button>
+                <button
+                  type="button"
+                  onClick={toggleTheme}
+                  className="px-2 py-0.5 rounded-lg border border-slate-200 text-[11px] font-medium text-slate-600 hover:bg-slate-100"
+                >
+                  {theme === 'light' ? 'Dark' : 'Light'}
+                </button>
+              </div>
             </div>
           </div>
         </div>
         <nav className="p-3 flex-1">
-          {nav.map(({ to, end, label, icon: Icon }) => (
+          {nav.map(({ to, end, labelKey, icon: Icon }) => (
             <NavLink
               key={to}
               to={to}
@@ -67,7 +87,7 @@ const StudentLayout = () => {
               }
             >
               <Icon className="text-lg shrink-0" />
-              {label}
+              {t(labelKey)}
             </NavLink>
           ))}
         </nav>
@@ -78,7 +98,7 @@ const StudentLayout = () => {
             className="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-slate-600 hover:bg-slate-100 hover:text-slate-800 font-medium transition-colors"
           >
             <FaSignOutAlt className="text-lg" />
-            Đăng xuất
+            {t('common.logout')}
           </button>
         </div>
       </aside>

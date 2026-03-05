@@ -2,20 +2,22 @@ import { Outlet } from 'react-router-dom'
 import { NavLink } from 'react-router-dom'
 import Header from './Header/Header'
 import Logo from '../components/Logo'
+import { useI18n } from '../contexts/I18nContext'
 
 const menuItems = [
-  { path: '/dashboard', label: 'Tổng quan' },
-  { path: '/dashboard/create-user', label: 'Tạo tài khoản' },
-  { path: '/dashboard/users', label: 'Người dùng' },
-  { path: '/dashboard/subjects', label: 'Môn học' },
-  { path: '/dashboard/courses', label: 'Khóa học' },
-  { path: '/dashboard/classes', label: 'Lớp học' },
-  { path: '/dashboard/payments', label: 'Học phí' },
-  { path: '/dashboard/journals', label: 'Nhật ký' },
-  { path: '/dashboard/reports', label: 'Báo cáo' },
+  { path: '/dashboard', labelKey: 'nav.dashboard' },
+  { path: '/dashboard/create-user', labelKey: 'nav.createUser' },
+  { path: '/dashboard/users', labelKey: 'nav.users' },
+  { path: '/dashboard/subjects', labelKey: 'nav.subjects' },
+  { path: '/dashboard/courses', labelKey: 'nav.courses' },
+  { path: '/dashboard/classes', labelKey: 'nav.classes' },
+  { path: '/dashboard/payments', labelKey: 'nav.payments' },
+  { path: '/dashboard/journals', labelKey: 'nav.journals' },
+  { path: '/dashboard/reports', labelKey: 'nav.reports' },
 ]
 
 export default function DashboardLayout() {
+  const { t } = useI18n()
   return (
     <div className="min-h-screen flex bg-slate-50/80">
       <aside className="w-64 shrink-0 flex flex-col border-r border-slate-200 bg-white shadow-sm z-20">
@@ -40,7 +42,7 @@ export default function DashboardLayout() {
                 }`
               }
             >
-              {item.label}
+              {t(item.labelKey)}
             </NavLink>
           ))}
         </nav>

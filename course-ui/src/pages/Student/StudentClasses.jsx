@@ -5,24 +5,34 @@ import ToastMessage from '../../messages/ToastMessage'
 import PageHeader from '../../components/ui/PageHeader'
 import EmptyState from '../../components/ui/EmptyState'
 import LoadingSpinner from '../../components/ui/LoadingSpinner'
+import Pagination from '../../components/ui/Pagination'
 import { FaBookOpen, FaChalkboardTeacher } from 'react-icons/fa'
 
 export default function StudentClasses() {
-  const [enrollments, setEnrollments] = useState([])
+  const [list, setList] = useState([])
+  const [total, setTotal] = useState(0)
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(12)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    axiosClient.get('/me/classes', { params: { limit: 50 } })
-      .then((res) => setEnrollments(res.data.data || []))
+    setLoading(true)
+    axiosClient.get('/me/classes', { params: { page: page - 1, size: pageSize } })
+      .then((res) => {
+        setList(res.data.data || [])
+        setTotal(res.data.total ?? 0)
+      })
       .catch(() => {
-        axiosClient.get('/dashboard/student').then((res) => setEnrollments(res.data.enrollments || [])).catch(ToastMessage.error)
+        axiosClient.get('/dashboard/student').then((res) => {
+          const en = res.data.enrollments || []
+          setList(en)
+          setTotal(en.length)
+        }).catch(ToastMessage.error)
       })
       .finally(() => setLoading(false))
-  }, [])
+  }, [page, pageSize])
 
-  if (loading) return <LoadingSpinner />
-
-  const list = Array.isArray(enrollments) ? enrollments : []
+  if (loading && list.length === 0) return <LoadingSpinner />
 
   return (
     <div className="space-y-8">
@@ -33,37 +43,48 @@ export default function StudentClasses() {
           <EmptyState icon={FaBookOpen} title="Chưa có lớp nào" description="Bạn chưa đăng ký lớp học. Liên hệ giáo vụ hoặc trung tâm để được xếp lớp." />
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          {list.map((c) => (
-            <div key={c._id} className="group rounded-xl border border-slate-200 bg-white p-6 hover:border-cyan-300 hover:shadow-lg transition-all">
-              <div className="flex items-start justify-between gap-3">
-                <div className="w-12 h-12 rounded-xl bg-cyan-100 text-cyan-600 flex items-center justify-center shrink-0">
-                  <FaBookOpen className="text-xl" />
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {list.map((c) => (
+              <div key={c._id} className="group rounded-xl border border-slate-200 bg-white p-6 hover:border-cyan-300 hover:shadow-lg transition-all">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="w-12 h-12 rounded-xl bg-cyan-100 text-cyan-600 flex items-center justify-center shrink-0">
+                    <FaBookOpen className="text-xl" />
+                  </div>
+                  <span className="text-xs font-medium text-slate-400 bg-slate-100 px-2.5 py-1 rounded-full">{c.classCode || '—'}</span>
                 </div>
-                <span className="text-xs font-medium text-slate-400 bg-slate-100 px-2.5 py-1 rounded-full">{c.classCode || '—'}</span>
-              </div>
-              <h3 className="mt-4 font-bold text-slate-800 text-lg">{c.className || 'Lớp học'}</h3>
-              <p className="mt-1 text-sm text-slate-500">{c.courseId?.courseName || 'Khóa học'}</p>
-              {c.teacherName && (
-                <p className="mt-3 flex items-center gap-2 text-sm text-slate-600">
-                  <FaChalkboardTeacher className="text-slate-400" /> {c.teacherName}
-                </p>
-              )}
-              <div className="mt-4 flex flex-wrap gap-3">
-                {c._id && (
-                  <Link to={`/student/classes/${c._id}/chat`} className="inline-flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-slate-800">
-                    Chat
-                  </Link>
+                <h3 className="mt-4 font-bold text-slate-800 text-lg">{c.className || 'Lớp học'}</h3>
+                <p className="mt-1 text-sm text-slate-500">{c.courseId?.courseName || 'Khóa học'}</p>
+                {c.teacherName && (
+                  <p className="mt-3 flex items-center gap-2 text-sm text-slate-600">
+                    <FaChalkboardTeacher className="text-slate-400" /> {c.teacherName}
+                  </p>
                 )}
-                {c.courseId?._id && (
-                  <Link to={`/student/courses/${c.courseId._id}`} className="inline-flex items-center gap-2 text-sm font-medium text-cyan-600 hover:text-cyan-700">
-                    Học nội dung khóa →
-                  </Link>
-                )}
+                <div className="mt-4 flex flex-wrap gap-3">
+                  {c._id && (
+                    <Link to={`/student/classes/${c._id}/chat`} className="inline-flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-slate-800">
+                      Chat
+                    </Link>
+                  )}
+                  {c.courseId?._id && (
+                    <Link to={`/student/courses/${c.courseId._id}`} className="inline-flex items-center gap-2 text-sm font-medium text-cyan-600 hover:text-cyan-700">
+                      Học nội dung khóa →
+                    </Link>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+          {list.length > 0 && (
+            <Pagination
+              page={page}
+              total={total}
+              pageSize={pageSize}
+              onPageChange={setPage}
+              onPageSizeChange={(s) => { setPageSize(s); setPage(1) }}
+            />
+          )}
+        </>
       )}
     </div>
   )

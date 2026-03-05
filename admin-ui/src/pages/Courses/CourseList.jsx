@@ -2,21 +2,25 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { axiosClient } from '../../utils/axiosClient'
 import ToastMessage from '../../messages/ToastMessage'
+import Pagination from '../../components/ui/Pagination'
 
 export default function CourseList() {
     const [list, setList] = useState([])
     const [total, setTotal] = useState(0)
+    const [page, setPage] = useState(1)
+    const [pageSize, setPageSize] = useState(10)
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        axiosClient.get('/courses', { params: { limit: 100 } })
+        setLoading(true)
+        axiosClient.get('/courses', { params: { page: page - 1, size: pageSize } })
             .then((res) => {
                 setList(res.data.data || [])
                 setTotal(res.data.total ?? 0)
             })
             .catch(ToastMessage.error)
             .finally(() => setLoading(false))
-    }, [])
+    }, [page, pageSize])
 
     if (loading) return <div className="p-4">Đang tải...</div>
 
@@ -52,7 +56,7 @@ export default function CourseList() {
                     </tbody>
                 </table>
             </div>
-            <p className="text-gray-500 text-sm mt-2">Tổng: {total}</p>
+            <Pagination page={page} total={total} pageSize={pageSize} onPageChange={setPage} onPageSizeChange={(s) => { setPageSize(s); setPage(1) }} />
         </div>
     )
 }

@@ -4,6 +4,7 @@ import ToastMessage from '../../messages/ToastMessage'
 import PageHeader from '../../components/ui/PageHeader'
 import EmptyState from '../../components/ui/EmptyState'
 import LoadingSpinner from '../../components/ui/LoadingSpinner'
+import Pagination from '../../components/ui/Pagination'
 import { FaChartBar, FaEdit } from 'react-icons/fa'
 import { Link } from 'react-router-dom'
 
@@ -21,24 +22,36 @@ function ScoreCell({ value }) {
 export default function StudentExams() {
   const [user, setUser] = useState(null)
   const [list, setList] = useState([])
+  const [total, setTotal] = useState(0)
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
   const [quizExams, setQuizExams] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const u = JSON.parse(localStorage.getItem('user') || '{}')
-    if (!u.id) { setLoading(false); return }
-    setUser(u)
-    Promise.all([
-      axiosClient.get(`/exams/students/${u.id}/results`, { params: { limit: 50 } }).then((res) => setList(res.data.data || [])).catch(ToastMessage.error),
-      axiosClient.get('/me/classes', { params: { limit: 50 } })
-        .then((res) => {
-          const classes = res.data.data || []
-          return Promise.all(classes.map((c) => axiosClient.get(`/exams/classes/${c._id}/exams`).then((r) => (Array.isArray(r.data) ? r.data : []).map((e) => ({ ...e, className: c.className }))).catch(() => [])))
-        })
-        .then((arr) => setQuizExams(arr.flat().filter((e) => e.examType === 'quiz')))
-        .catch(() => {}),
-    ]).finally(() => setLoading(false))
+    if (u.id) setUser(u)
+    else setLoading(false)
   }, [])
+
+  useEffect(() => {
+    if (!user?.id) return
+    setLoading(true)
+    Promise.all([
+      axiosClient.get(`/exams/students/${user.id}/results`, { params: { page: page - 1, size: pageSize } })
+        .then((res) => { setList(res.data.data || []); setTotal(res.data.total ?? 0) })
+        .catch(ToastMessage.error),
+      page === 1
+        ? axiosClient.get('/me/classes', { params: { page: 0, size: 100 } })
+            .then((res) => {
+              const classes = res.data.data || []
+              return Promise.all(classes.map((c) => axiosClient.get(`/exams/classes/${c._id}/exams`).then((r) => (Array.isArray(r.data) ? r.data : []).map((e) => ({ ...e, className: c.className }))).catch(() => [])))
+            })
+            .then((arr) => setQuizExams(arr.flat().filter((e) => e.examType === 'quiz')))
+            .catch(() => {})
+        : Promise.resolve(),
+    ]).finally(() => setLoading(false))
+  }, [user?.id, page, pageSize])
 
   if (loading) return <LoadingSpinner />
 
@@ -94,6 +107,7 @@ export default function StudentExams() {
               </tbody>
             </table>
           </div>
+          <Pagination page={page} total={total} pageSize={pageSize} onPageChange={setPage} onPageSizeChange={(s) => { setPageSize(s); setPage(1) }} />
         </div>
       )}
     </div>

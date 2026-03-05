@@ -4,6 +4,7 @@ import { axiosClient } from '../../utils/axiosClient'
 import ToastMessage from '../../messages/ToastMessage'
 import PageHeader from '../../components/ui/PageHeader'
 import Badge from '../../components/ui/Badge'
+import Pagination from '../../components/ui/Pagination'
 
 const ENROLL_LABEL = { active: 'Đang học', suspended: 'Đình chỉ', 'transfer pending': 'Chờ chuyển lớp', dropped: 'Thôi học' }
 const ENROLL_BADGE = { active: 'success', suspended: 'warning', 'transfer pending': 'info', dropped: 'danger' }
@@ -15,8 +16,15 @@ export default function ClassDetail() {
     const [tab, setTab] = useState(0)
     const [classInfo, setClassInfo] = useState(null)
     const [students, setStudents] = useState([])
+    const [studentTotal, setStudentTotal] = useState(0)
+    const [studentPage, setStudentPage] = useState(1)
+    const [studentPageSize, setStudentPageSize] = useState(10)
+    const [enrolledStudentIds, setEnrolledStudentIds] = useState([])
     const [teachers, setTeachers] = useState([])
     const [journals, setJournals] = useState([])
+    const [journalTotal, setJournalTotal] = useState(0)
+    const [journalPage, setJournalPage] = useState(1)
+    const [journalPageSize, setJournalPageSize] = useState(10)
     const [exams, setExams] = useState([])
     const [courses, setCourses] = useState([])
     const [users, setUsers] = useState([])
@@ -26,9 +34,22 @@ export default function ClassDetail() {
     const [statusEdit, setStatusEdit] = useState({})
 
     const loadClass = () => axiosClient.get(`/classes/${id}`).then((res) => setClassInfo(res.data)).catch(ToastMessage.error)
-    const loadStudents = () => axiosClient.get(`/classes/${id}/students`, { params: { limit: 100 } }).then((res) => setStudents(res.data.data || [])).catch(ToastMessage.error)
+    const loadStudents = () => {
+        axiosClient.get(`/classes/${id}/students`, { params: { page: studentPage - 1, size: studentPageSize } })
+            .then((res) => { setStudents(res.data.data || []); setStudentTotal(res.data.total ?? 0) })
+            .catch(ToastMessage.error)
+    }
+    const loadEnrolledIds = () => {
+        axiosClient.get(`/classes/${id}/students`, { params: { page: 0, size: 500 } })
+            .then((res) => setEnrolledStudentIds((res.data.data || []).map((s) => s.studentId?._id).filter(Boolean)))
+            .catch(() => setEnrolledStudentIds([]))
+    }
     const loadTeachers = () => axiosClient.get(`/classes/${id}/teachers`).then((res) => setTeachers(Array.isArray(res.data) ? res.data : [])).catch(ToastMessage.error)
-    const loadJournals = () => axiosClient.get(`/journals/classes/${id}/journals`, { params: { limit: 50 } }).then((res) => setJournals(res.data.data || [])).catch(ToastMessage.error)
+    const loadJournals = () => {
+        axiosClient.get(`/journals/classes/${id}/journals`, { params: { page: journalPage - 1, size: journalPageSize } })
+            .then((res) => { setJournals(res.data.data || []); setJournalTotal(res.data.total ?? 0) })
+            .catch(ToastMessage.error)
+    }
     const loadExams = () => axiosClient.get(`/exams/classes/${id}/exams`).then((res) => setExams(res.data || [])).catch(ToastMessage.error)
 
     useEffect(() => {
@@ -38,24 +59,33 @@ export default function ClassDetail() {
 
     useEffect(() => {
         if (!id) return
-        if (tab === 1) loadStudents()
+        if (tab === 1) loadEnrolledIds()
         if (tab === 2) loadTeachers()
-        if (tab === 3) loadJournals()
         if (tab === 4) loadExams()
     }, [id, tab])
+
+    useEffect(() => {
+        if (!id || tab !== 1) return
+        loadStudents()
+    }, [id, tab, studentPage, studentPageSize])
+
+    useEffect(() => {
+        if (!id || tab !== 3) return
+        loadJournals()
+    }, [id, tab, journalPage, journalPageSize])
 
     useEffect(() => {
         axiosClient.get('/courses', { params: { limit: 200 } }).then((res) => setCourses(res.data.data || [])).catch(() => {})
         axiosClient.get('/users', { params: { limit: 200 } }).then((res) => setUsers(res.data.data || [])).catch(() => {})
     }, [])
 
-    const studentsOption = users.filter((u) => u.role === 'student').filter((u) => !students.some((s) => s.studentId?._id === u._id))
+    const studentsOption = users.filter((u) => u.role === 'student').filter((u) => !enrolledStudentIds.includes(u._id))
     const teachersOption = users.filter((u) => u.role === 'teacher').filter((u) => !teachers.some((t) => t._id === u._id))
 
     const handleAddStudent = () => {
         if (!addStudentId) return
         axiosClient.post(`/classes/${id}/students`, { studentId: addStudentId })
-            .then(() => { setAddStudentId(''); loadStudents(); ToastMessage.success('Đã thêm học viên') })
+            .then(() => { setAddStudentId(''); loadEnrolledIds(); loadStudents(); ToastMessage.success('Đã thêm học viên') })
             .catch(ToastMessage.error)
     }
 
@@ -68,14 +98,14 @@ export default function ClassDetail() {
 
     const handleUpdateStatus = (studentId, status) => {
         axiosClient.patch(`/classes/${id}/students/${studentId}/status`, { status })
-            .then(() => { loadStudents(); setStatusEdit({}); ToastMessage.success('Đã cập nhật trạng thái') })
+            .then(() => { loadStudents(); loadEnrolledIds(); setStatusEdit({}); ToastMessage.success('Đã cập nhật trạng thái') })
             .catch(ToastMessage.error)
     }
 
     const handleRemoveStudent = (studentId) => {
         if (!window.confirm('Xóa học viên khỏi lớp?')) return
         axiosClient.delete(`/classes/${id}/students/${studentId}`)
-            .then(() => { loadStudents(); ToastMessage.success('Đã xóa') })
+            .then(() => { loadEnrolledIds(); loadStudents(); ToastMessage.success('Đã xóa') })
             .catch(ToastMessage.error)
     }
 
@@ -144,6 +174,9 @@ export default function ClassDetail() {
                             ))}
                         </tbody>
                     </table>
+                    {studentTotal > 0 && (
+                        <Pagination page={studentPage} total={studentTotal} pageSize={studentPageSize} onPageChange={setStudentPage} onPageSizeChange={(s) => { setStudentPageSize(s); setStudentPage(1) }} />
+                    )}
                 </div>
             )}
 
@@ -182,6 +215,9 @@ export default function ClassDetail() {
                         ))}
                         {journals.length === 0 && <li className="text-gray-400">Chưa có nhật ký.</li>}
                     </ul>
+                    {journalTotal > 0 && (
+                        <Pagination page={journalPage} total={journalTotal} pageSize={journalPageSize} onPageChange={setJournalPage} onPageSizeChange={(s) => { setJournalPageSize(s); setJournalPage(1) }} />
+                    )}
                 </div>
             )}
 

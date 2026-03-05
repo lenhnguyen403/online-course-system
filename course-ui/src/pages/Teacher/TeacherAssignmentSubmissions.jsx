@@ -4,11 +4,15 @@ import { axiosClient } from '../../utils/axiosClient'
 import ToastMessage from '../../messages/ToastMessage'
 import PageHeader from '../../components/ui/PageHeader'
 import LoadingSpinner from '../../components/ui/LoadingSpinner'
+import Pagination from '../../components/ui/Pagination'
 
 export default function TeacherAssignmentSubmissions() {
   const { classId, assignmentId } = useParams()
   const [assignment, setAssignment] = useState(null)
-  const [submissions, setSubmissions] = useState({ data: [], total: 0 })
+  const [submissionsList, setSubmissionsList] = useState([])
+  const [total, setTotal] = useState(0)
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
   const [loading, setLoading] = useState(true)
   const [grading, setGrading] = useState(null)
   const [gradeForm, setGradeForm] = useState({ score: '', feedback: '', rubricScores: [] })
@@ -19,12 +23,17 @@ export default function TeacherAssignmentSubmissions() {
       .catch(ToastMessage.error)
   }, [classId, assignmentId])
 
-  useEffect(() => {
-    axiosClient.get(`/classes/${classId}/assignments/${assignmentId}/submissions`, { params: { limit: 100 } })
-      .then((res) => setSubmissions({ data: res.data.data || [], total: res.data.total ?? 0 }))
-      .catch(() => setSubmissions({ data: [], total: 0 }))
+  const loadSubmissions = () => {
+    setLoading(true)
+    axiosClient.get(`/classes/${classId}/assignments/${assignmentId}/submissions`, { params: { page: page - 1, size: pageSize } })
+      .then((res) => { setSubmissionsList(res.data.data || []); setTotal(res.data.total ?? 0) })
+      .catch(() => { setSubmissionsList([]); setTotal(0) })
       .finally(() => setLoading(false))
-  }, [classId, assignmentId])
+  }
+
+  useEffect(() => {
+    loadSubmissions()
+  }, [classId, assignmentId, page, pageSize])
 
   const handleGrade = (e) => {
     e.preventDefault()
@@ -40,8 +49,7 @@ export default function TeacherAssignmentSubmissions() {
         ToastMessage.success('Đã chấm điểm')
         setGrading(null)
         setGradeForm({ score: '', feedback: '', rubricScores: [] })
-        axiosClient.get(`/classes/${classId}/assignments/${assignmentId}/submissions`, { params: { limit: 100 } })
-          .then((res) => setSubmissions({ data: res.data.data || [], total: res.data.total ?? 0 }))
+        loadSubmissions()
       })
       .catch(ToastMessage.error)
   }
@@ -62,12 +70,13 @@ export default function TeacherAssignmentSubmissions() {
       />
 
       <div className="card card-body">
-        <p className="text-sm text-slate-500 mb-4">Tổng: {submissions.total} bài nộp</p>
-        {submissions.data.length === 0 ? (
+        <p className="text-sm text-slate-500 mb-4">Tổng: {total} bài nộp</p>
+        {submissionsList.length === 0 ? (
           <p className="text-slate-500">Chưa có bài nộp nào.</p>
         ) : (
+          <>
           <ul className="space-y-4">
-            {submissions.data.map((sub) => (
+            {submissionsList.map((sub) => (
               <li key={sub._id} className="border border-slate-200 rounded-xl p-4">
                 <div className="flex items-start justify-between gap-4 flex-wrap">
                   <div>
@@ -110,6 +119,8 @@ export default function TeacherAssignmentSubmissions() {
               </li>
             ))}
           </ul>
+          <Pagination page={page} total={total} pageSize={pageSize} onPageChange={setPage} onPageSizeChange={(s) => { setPageSize(s); setPage(1) }} />
+          </>
         )}
       </div>
     </div>

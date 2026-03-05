@@ -1,5 +1,6 @@
 import { Payment } from '../models/payment.model.js';
 import { PAYMENT_STATUS } from '../constants/PaymentStatus.js';
+import { sendPaymentReminderEmail } from './email.service.js';
 
 export const getStudentPayments = async (studentId, pagination) => {
     const [data, total] = await Promise.all([
@@ -49,8 +50,19 @@ export const getNextPayment = async (studentId) => {
 };
 
 export const sendReminder = async (paymentId) => {
-    const payment = await Payment.findById(paymentId).populate('studentId', 'email fullName');
+    const payment = await Payment.findById(paymentId)
+        .populate('studentId', 'email fullName')
+        .populate('classId', 'className');
     if (!payment) throw { status: 404, message: 'Payment not found' };
-    // TODO: send email reminder
+    const toEmail = payment.studentId?.email;
+    const fullName = payment.studentId?.fullName || 'Học viên';
+    if (!toEmail) throw { status: 400, message: 'Student email not found' };
+    await sendPaymentReminderEmail(
+        toEmail,
+        fullName,
+        payment.classId?.className || '',
+        payment.dueDate,
+        payment.amount
+    );
     return { message: 'Reminder sent' };
 };

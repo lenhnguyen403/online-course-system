@@ -56,7 +56,7 @@ export const getTeacherDashboard = async (userId) => {
     };
 };
 
-export const getTeacherPendingSubmissions = async (userId, limit = 50) => {
+export const getTeacherPendingSubmissions = async (userId, pagination) => {
     const myClasses = await Class.find({ teacherIds: userId }).select('_id className').lean();
     const classIds = myClasses.map((c) => c._id);
     const assignments = await Assignment.find({ classId: { $in: classIds } })
@@ -64,13 +64,17 @@ export const getTeacherPendingSubmissions = async (userId, limit = 50) => {
         .populate('classId', 'className classCode')
         .lean();
     const assignmentIds = assignments.map((a) => a._id);
-    if (!assignmentIds.length) return { data: [], total: 0 };
-    const submissions = await Submission.find({ assignmentId: { $in: assignmentIds }, score: null })
-        .populate('assignmentId')
-        .populate('studentId', 'fullName email')
-        .sort({ submittedAt: 1 })
-        .limit(limit)
-        .lean();
+    if (!assignmentIds.length) return { data: [], total: 0, ...pagination };
+    const [submissions, total] = await Promise.all([
+        Submission.find({ assignmentId: { $in: assignmentIds }, score: null })
+            .populate('assignmentId')
+            .populate('studentId', 'fullName email')
+            .sort({ submittedAt: 1 })
+            .skip(pagination.offset)
+            .limit(pagination.limit)
+            .lean(),
+        Submission.countDocuments({ assignmentId: { $in: assignmentIds }, score: null }),
+    ]);
     const byAssignment = Object.fromEntries(assignments.map((a) => [a._id.toString(), a]));
     const data = submissions.map((s) => {
         const ass = byAssignment[s.assignmentId?._id?.toString()] || s.assignmentId;
@@ -88,8 +92,7 @@ export const getTeacherPendingSubmissions = async (userId, limit = 50) => {
             submittedAt: s.submittedAt,
         };
     });
-    const total = await Submission.countDocuments({ assignmentId: { $in: assignmentIds }, score: null });
-    return { data, total };
+    return { data, total, ...pagination };
 };
 
 export const getStudentDashboard = async (userId) => {

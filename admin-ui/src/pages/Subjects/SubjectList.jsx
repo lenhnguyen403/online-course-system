@@ -3,23 +3,27 @@ import { axiosClient } from '../../utils/axiosClient'
 import ToastMessage from '../../messages/ToastMessage'
 import PageHeader from '../../components/ui/PageHeader'
 import LoadingSpinner from '../../components/ui/LoadingSpinner'
+import Pagination from '../../components/ui/Pagination'
 import { FaBook } from 'react-icons/fa'
 
 export default function SubjectList() {
   const [list, setList] = useState([])
+  const [total, setTotal] = useState(0)
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [form, setForm] = useState({ subjectCode: '', subjectName: '' })
 
-    const load = () => {
-        setLoading(true)
-        axiosClient.get('/subjects', { params: { limit: 100 } })
-            .then((res) => setList(res.data.data || []))
-            .catch(ToastMessage.error)
-            .finally(() => setLoading(false))
-    }
+  const load = () => {
+    setLoading(true)
+    axiosClient.get('/subjects', { params: { page: page - 1, size: pageSize } })
+      .then((res) => { setList(res.data.data || []); setTotal(res.data.total ?? 0) })
+      .catch(ToastMessage.error)
+      .finally(() => setLoading(false))
+  }
 
-    useEffect(() => load(), [])
+  useEffect(() => load(), [page, pageSize])
 
     const handleSubmit = (e) => {
         e.preventDefault()
@@ -32,6 +36,7 @@ export default function SubjectList() {
                 ToastMessage.success('Thêm môn học thành công')
                 setForm({ subjectCode: '', subjectName: '' })
                 setShowForm(false)
+                setPage(1)
                 load()
             })
             .catch(ToastMessage.error)
@@ -67,6 +72,7 @@ export default function SubjectList() {
               </tbody>
             </table>
           </div>
+          <Pagination page={page} total={total} pageSize={pageSize} onPageChange={setPage} onPageSizeChange={(s) => { setPageSize(s); setPage(1) }} />
         </div>
       </div>
     </div>

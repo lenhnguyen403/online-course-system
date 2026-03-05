@@ -12,8 +12,7 @@ export const getTeacherDashboard = async (req, res) => {
 };
 
 export const getTeacherPendingSubmissions = async (req, res) => {
-    const limit = Math.min(Number(req.query.limit) || 50, 100);
-    const data = await dashboardService.getTeacherPendingSubmissions(req.user.id, limit);
+    const data = await dashboardService.getTeacherPendingSubmissions(req.user.id, req.pagination);
     return res.status(200).json(data);
 };
 

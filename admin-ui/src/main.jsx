@@ -4,14 +4,17 @@ import './index.css'
 import App from './App.jsx'
 import { BrowserRouter } from 'react-router-dom'
 import { ThemeProvider } from './providers/ThemeProvider'
+import { I18nProvider } from './contexts/I18nContext'
 import { ToastContainer } from 'react-toastify';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>
       <ThemeProvider>
-        <ToastContainer />
-        <App />
+        <I18nProvider defaultLang="vi">
+          <ToastContainer />
+          <App />
+        </I18nProvider>
       </ThemeProvider>
     </BrowserRouter>
   </StrictMode>,

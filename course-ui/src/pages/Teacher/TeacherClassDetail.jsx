@@ -5,6 +5,7 @@ import ToastMessage from '../../messages/ToastMessage'
 import PageHeader from '../../components/ui/PageHeader'
 import Badge from '../../components/ui/Badge'
 import LoadingSpinner from '../../components/ui/LoadingSpinner'
+import Pagination from '../../components/ui/Pagination'
 import { FaPenFancy, FaUsers, FaFilter, FaTasks, FaBullhorn, FaComments } from 'react-icons/fa'
 
 const STATUS_LABEL = { active: 'Đang học', suspended: 'Đình chỉ', 'transfer pending': 'Chờ chuyển lớp', dropped: 'Thôi học' }
@@ -15,6 +16,8 @@ export default function TeacherClassDetail() {
   const [classInfo, setClassInfo] = useState(null)
   const [students, setStudents] = useState([])
   const [total, setTotal] = useState(0)
+  const [studentPage, setStudentPage] = useState(1)
+  const [studentPageSize, setStudentPageSize] = useState(10)
   const [statusFilter, setStatusFilter] = useState('')
   const [journalContent, setJournalContent] = useState('')
   const [loading, setLoading] = useState(true)
@@ -31,7 +34,8 @@ export default function TeacherClassDetail() {
     axiosClient.get(`/classes/${classId}`).then((res) => setClassInfo(res.data)).catch(ToastMessage.error)
   }
   const loadStudents = () => {
-    const params = statusFilter ? { status: statusFilter, limit: 100 } : { limit: 100 }
+    const params = { page: studentPage - 1, size: studentPageSize }
+    if (statusFilter) params.status = statusFilter
     axiosClient.get(`/classes/${classId}/students`, { params })
       .then((res) => { setStudents(res.data.data || []); setTotal(res.data.total ?? 0) })
       .catch(ToastMessage.error)
@@ -49,7 +53,7 @@ export default function TeacherClassDetail() {
     axiosClient.get(`/classes/${classId}/messages`, { params: { limit: 50 } }).then((res) => setMessages(res.data.data || [])).catch(() => setMessages([]))
   }
   useEffect(() => { loadClass() }, [classId])
-  useEffect(() => { if (classId) loadStudents() }, [classId, statusFilter])
+  useEffect(() => { if (classId) loadStudents() }, [classId, statusFilter, studentPage, studentPageSize])
   useEffect(() => { if (classId) { loadAssignments(); loadAnnouncements(); loadMessages() } }, [classId])
   useEffect(() => { setLoading(false) }, [classInfo])
 
@@ -129,7 +133,7 @@ export default function TeacherClassDetail() {
             <div className="flex items-center gap-3">
               <Link to={`/teacher/classes/${classId}/learning-report`} className="text-cyan-600 text-sm font-medium hover:underline">Báo cáo học tập</Link>
               <FaFilter className="text-slate-400 text-sm" />
-              <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="rounded-xl border border-slate-200 px-3 py-2 text-sm">
+              <select value={statusFilter} onChange={(e) => { setStatusFilter(e.target.value); setStudentPage(1) }} className="rounded-xl border border-slate-200 px-3 py-2 text-sm">
                 <option value="">Tất cả trạng thái</option>
                 {Object.entries(STATUS_LABEL).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
               </select>
@@ -161,6 +165,15 @@ export default function TeacherClassDetail() {
               </tbody>
             </table>
           </div>
+          {total > 0 && (
+            <Pagination
+              page={studentPage}
+              total={total}
+              pageSize={studentPageSize}
+              onPageChange={setStudentPage}
+              onPageSizeChange={(s) => { setStudentPageSize(s); setStudentPage(1) }}
+            />
+          )}
         </div>
       </section>
 
